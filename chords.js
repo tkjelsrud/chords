@@ -19,15 +19,14 @@ function chordToStruct(chord) {
   if(chord.indexOf("min") == -1) {
     chord = chord.replace("m", "min");
   }
-  if(chord.length == 1) {
-    chS.tone = "maj";
-  }
   
   chS.root = chord.charAt(0);
   chS.tone = chord.slice(1);
   
   if(chS.tone in chordNotes)
     chS.notes = chordNotes[chS.tone];
+  if(chS.tone == "")
+    chS.tone = "maj";
   
   return chS;
 }
