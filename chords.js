@@ -4,7 +4,7 @@ var notes = new Array("C", "C# Db", "D", "D# Eb", "E", "F", "F# Gb", "G", "G# Ab
 var positions = new Array("1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7");
 
 function chordToStruct(chord) {
-  chS = {'root': "", 'flat': false, 'raised': false, 'tone': ""};
+  chS = {'root': "", 'flat': false, 'raised': false, 'tone': "", 'notes': []};
   chord = chord.replace(" ", "");
   
   if(chord.indexOf("#") >= 0) {
@@ -16,15 +16,18 @@ function chordToStruct(chord) {
     chS.flat = true;
     chord = chord.replace("b", "");
   }
-  
-  if(chord.endsWith("m7")) {
-     tone = "min7";
-     chord = chord.replace("m7", "");
+  if(chord.indexOf("min") == -1) {
+    chord = chord.replace("m", "min");
   }
-  // Hmm, A7, Ab5? sus2 sus4 add9
-  //
-  //
+  if(chord.length == 1) {
+    chS.tone = "maj";
+  }
+  
   chS.root = chord.charAt(0);
+  chS.tone = chord.slice(1);
+  
+  if(chS.tone in chordNotes)
+    chS.notes = chordNotes[chS.tone];
   
   return chS;
 }
