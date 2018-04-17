@@ -24,7 +24,7 @@ function chordToStruct(chord) {
   // Hmm, A7, Ab5? sus2 sus4 add9
   //
   //
-  csS.root = chord.charAt(0);
+  chS.root = chord.charAt(0);
   
-  return csS;
+  return chS;
 }
