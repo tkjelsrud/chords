@@ -30,7 +30,7 @@ function checkKey(e) {
 }
 function newChordBox(text) {
   note = chordToStruct(text);
-  document.getElementById("chordlist").innerHTML = "<div>" + String(note) + "</div>";
+  document.getElementById("chordlist").innerHTML = "<div>" + JSON.stringify(note) + "</div>";
 }
 </script>
 </head>
