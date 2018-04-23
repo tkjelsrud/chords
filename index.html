@@ -1,5 +1,6 @@
 <html>
 <head>
+<script type="text/javascript" src="chords.js"></script>
 <script type="text/javascript">
 //
 // Look for input
@@ -9,6 +10,28 @@
 // -- maybe based on making everything absolute notes then comparing?
 //
 //
+document.onkeydown = checkKey;
+var buffer = "";
+
+function checkKey(e) {
+  e = e || window.event;
+
+  if (e.keyCode == '39' || e.keyCode == '13') {
+    // Next, right arrow
+    newChordBox(buffer);
+    buffer = "";
+  }
+  else if (e.keyCode == '37') {
+     // left arrow
+  }
+  else {
+    buffer += String.fromCharCode(e.keyCode);
+  }
+}
+function newChordBox(text) {
+  note = chordToStruct(text);
+  document.getElementById("chordlist").innerHTML = "<div>" + String(note) + "</div>";
+}
 </script>
 </head>
 
