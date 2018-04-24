@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>v2</title>
+  <title>v3</title>
   <script type="text/javascript" src="chords.js"></script>
   <script type="text/javascript">
 //
@@ -31,7 +31,7 @@ function checkKey(e) {
 }
 function newChordBox(text) {
   note = chordToStruct(text);
-  document.getElementById("chordlist").innerHTML = "<div>" + JSON.stringify(note) + "</div>";
+  document.getElementById("chordlist").innerHTML += "<div style=\"border:1px solid grey\">" + JSON.stringify(note) + "</div>";
 }
 </script>
 </head>
