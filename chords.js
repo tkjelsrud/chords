@@ -3,6 +3,7 @@ var chordNotes = {"maj": ["1", "3", "5"], "maj7": ["1", "3", "5", "7"], "min": [
                   "min7": ["1", "b3", "5", "b7"], "sus2": ["1","2","5"], "sus4": ["1","4","5"], "5": ["1", "5"], 
                   "6": ["1", "3", "6"], "min6": ["1", "b3", "5", "b6"]};
 var notes = new Array("C", "C# Db", "D", "D# Eb", "E", "F", "F# Gb", "G", "G# Ab", "A", "A# Bb", "B");
+var roots = new Array("C", "D", "E", "F", "G", "A", "B");
 var positions = new Array("1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7");
 
 function chordToStruct(chord) {
@@ -22,7 +23,12 @@ function chordToStruct(chord) {
     chord = chord.replace("m", "min");
   }
   
-  chS.root = chord.charAt(0);
+  r = chord.charAt(0).toUpperCase();
+  if(r == "H") r = "B";
+  if(roots.indexOf(r) >= 0) {
+    chS.root = r;
+  }
+  
   chS.tone = chord.slice(1);
    if(chS.tone == "")
      chS.tone = "maj";
