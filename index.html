@@ -2,10 +2,14 @@
 <head>
   <title>v4</title>
   <style>
-    #chordList div {
-     width: 100px;
+    .lane div {
+      width: 180px;
       float: left;
       border: 1px solid grey;
+      margin: 4px;
+    }
+    .lane {
+      height: 100px;
     }
   </style>
   <script type="text/javascript" src="chords.js"></script>
@@ -38,14 +42,16 @@ function checkKey(e) {
 }
 function newChordBox(text) {
   note = chordToStruct(text);
-  document.getElementById("chordlist").innerHTML += "<div>" + JSON.stringify(note) + "</div>";
+  document.getElementById("chordlist").innerHTML += "<div>" + note.actual[0] + note.tone + "</div>";
+
+  document.getElementById("notelist").innerHTML += "<div>" + JSON.stringify(note.actual) + "</div>";
 }
 </script>
 </head>
 
 <body>
-  <div id="chordlist">&nbsp;</div>
-  <div id="scalelist">&nbsp;</div>
-  <div id="notelist">&nbsp;</div>
+  <div id="chordlist" class="lane">&nbsp;</div>
+  <div id="notelist" class="lane">&nbsp;</div>
+  <div id="scalelist" class="lane">&nbsp;</div>
 </body>
 </html>
