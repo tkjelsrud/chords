@@ -48,10 +48,12 @@ function newChordBox(text) {
   document.getElementById("chordlist").innerHTML += "<div>" + note.actual[0] + note.tone + "</div>";
   
   document.getElementById("notelist").innerHTML += "<div>";
+  console.log(note.actual);
+  
   for(i = 0;i < note.actual.length; i++) {
-    document.getElementById("notelist").innerHTML += "<span class=\".nt" + note.actual[i] + "\">" + note.actual[i] + "</span";
+    document.getElementById("notelist").innerHTML += "<span class=\".nt" + note.actual[i] + "\">" + note.actual[i] + "</span>";
   }
-  document.getElementById("notelist").innerHTML += "<div>" + JSON.stringify(note.actual) + "</div>";
+  document.getElementById("notelist").innerHTML += "</div>";
 }
 </script>
 </head>
