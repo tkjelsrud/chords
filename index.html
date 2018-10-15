@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>v5..</title>
+  <title>v5.</title>
   <style>
     .lane div {
       width: 180px;
@@ -55,7 +55,7 @@ function newChordBox(text) {
   for(i = 0;i < note.actual.length; i++) {
     html += "<span class=\"nt" + note.actual[i] + "\">" + note.actual[i] + "</span>";
   }
-  document.getElementById("notelist").innerHTML = html + "</div>";
+  document.getElementById("notelist").innerHTML += html + "</div>";
 }
 </script>
 </head>
