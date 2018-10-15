@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>v5.</title>
+  <title>v5..</title>
   <style>
     .lane div {
       width: 180px;
@@ -13,6 +13,9 @@
     }
     .ntC {
       color: rgba(248, 250, 76, 1);
+    }
+    .ntG {
+      color: rgba(250, 186, 76, 1);
     }
   </style>
   <script type="text/javascript" src="chords.js"></script>
@@ -45,15 +48,14 @@ function checkKey(e) {
 }
 function newChordBox(text) {
   note = chordToStruct(text);
-  document.getElementById("chordlist").innerHTML += "<div>" + note.actual[0] + note.tone + "</div>";
-  
-  document.getElementById("notelist").innerHTML += "<div>";
+  html = "<div>" + note.actual[0] + note.tone + "</div>";
+  html += "<div>";
   console.log(note.actual);
   
   for(i = 0;i < note.actual.length; i++) {
-    document.getElementById("notelist").innerHTML += "<span class=\"nt" + note.actual[i] + "\">" + note.actual[i] + "</span>";
+    html += "<span class=\"nt" + note.actual[i] + "\">" + note.actual[i] + "</span>";
   }
-  document.getElementById("notelist").innerHTML += "</div>";
+  document.getElementById("notelist").innerHTML = html + "</div>";
 }
 </script>
 </head>
