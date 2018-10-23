@@ -10,6 +10,7 @@ function chordToStruct(chord) {
   chS = {'root': "", 'flat': false, 'raised': false, 'tone': "", 'notes': [], 'actual': []};
   chord = chord.replace(" ", "");
 
+  // Following two statements are bad as # and b can be on multiple stages
   if(chord.indexOf("#") >= 0) {
     chS.raised = true;
     chord = chord.replace("#", "");
@@ -36,6 +37,8 @@ function chordToStruct(chord) {
   chS.tone = chord.slice(1);
   if(chS.tone == "")
      chS.tone = "maj";
+  if(chS.tone == "7")
+     chS.tone = "maj7";
 
   if(chS.tone in chordNotes)
     chS.notes = chordNotes[chS.tone];
