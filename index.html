@@ -20,43 +20,56 @@
   </style>
   <script type="text/javascript" src="chords.js"></script>
   <script type="text/javascript">
-//
-// Look for input
-// If known, add as new chord
-// Have a base of chord break down and indiviual notes
-// Have a base of all chord scales to be matched
-// -- maybe based on making everything absolute notes then comparing?
-//
-//
-document.onkeypress = checkKey;
-var buffer = "";
+    //
+    // Look for input
+    // If known, add as new chord
+    // Have a base of chord break down and indiviual notes
+    // Have a base of all chord scales to be matched
+    // -- maybe based on making everything absolute notes then comparing?
+    //
+    //
+    document.onkeypress = checkKey;
+    var buffer = "";
+    var noteInputList = new Array();
 
-function checkKey(e) {
-  e = e || window.event;
+    function checkKey(e) {
+      e = e || window.event;
 
-  if (e.keyCode == '39' || e.keyCode == '13') {
-    // Next, right arrow
-    newChordBox(buffer);
-    buffer = "";
-  }
-  else if (e.keyCode == '37') {
-     // left arrow
-  }
-  else {
-    buffer += String.fromCharCode(e.keyCode);
-  }
-}
-function newChordBox(text) {
-  note = chordToStruct(text);
-  html = "<div>" + note.actual[0] + note.tone + "</div>";
-  html += "<div>";
-  console.log(note.actual);
-  
-  for(i = 0;i < note.actual.length; i++) {
-    html += "<span class=\"nt" + note.actual[i] + "\">" + note.actual[i] + "</span>";
-  }
-  document.getElementById("notelist").innerHTML += html + "</div>";
-}
+      if (e.keyCode == '39' || e.keyCode == '13') {
+        // Next, right arrow
+        newChordBox(buffer);
+        buffer = "";
+      }
+      else if (e.keyCode == '37') {
+         // left arrow
+      }
+      else {
+        buffer += String.fromCharCode(e.keyCode);
+      }
+    }
+
+    function newChordBox(text) {
+      chord = chordToStruct(text);
+
+      if(chord.root == null) {
+        console.log("Could not parse: " + text);
+      }
+      else {
+        html = "<div>" + chord.actual[0] + chord.tone + "</div>";
+        html += "<div>";
+        console.log(chord.actual);
+
+        for(i = 0;i < chord.actual.length; i++) {
+          html += "<span class=\"nt" + chord.actual[i] + "\">" + chord.actual[i] + "</span> ";
+        }
+        document.getElementById("notelist").innerHTML += html + "</div>";
+        noteInputList.push(chord);
+      }
+    }
+
+    function inputToScale() {
+      
+    }
 </script>
 </head>
 
