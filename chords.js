@@ -7,6 +7,12 @@ var notes = new Array("C", "C# Db", "D", "D# Eb", "E", "F", "F# Gb", "G", "G# Ab
 var roots = new Array("C", "D", "E", "F", "G", "A", "B");
 var positions = new Array("1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7");
 
+const harmonies = {
+    absolute: new Array(12),
+    showDetails() {
+    }
+};
+
 function chordToStruct(chord) {
   chS = {'root': "", 'flat': false, 'raised': false, 'tone': "", 'notes': [], 'actual': []};
   chord = chord.replace(" ", "");
@@ -103,7 +109,7 @@ function allNotes(chordStructList) {
 function noteListToPos(noteList, rX = 0) {
   // ...
   struct = {'root': noteList[rX], 'rootPos': notes.indexOf(noteList[rX]), 'positions': ["1"]}; //
-  
+
   for(i = 1; i < noteList.length; i++) {
     n = noteList[i];
     off = struct.rootPos + notes.indexOf(n);
