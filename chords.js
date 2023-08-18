@@ -54,13 +54,14 @@ function chordToStruct(chord) {
   return chS;
 }
 
-function cleanChordtext(text) {
-  for (let i = text.length -1; i > 0; i--) {
-    if (! text[i].toUpperCase().match("[a-h]|m|#")) {
-      text.slice(i);
+function cleanChordText(text) {
+  let newText = "";
+  for (let i = 0; i < text.length; i++) {
+    if (text[i].toLowerCase().match("[a-h]|m|#")) {
+      newText += text[i];
     }
   }
-  return text;
+  return newText;
 }
 
 function chordToNotes(rootNum, pos) {
