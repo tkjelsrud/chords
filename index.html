@@ -37,7 +37,8 @@
 
       if (e.keyCode == '39' || e.keyCode == '13') {
         // Next, right arrow
-        newChordBox(buffer);
+        let inText = cleanChordtext(buffer);
+        newChordBox(inText);
         buffer = "";
       }
       else if (e.keyCode == '37') {
