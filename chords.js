@@ -54,6 +54,15 @@ function chordToStruct(chord) {
   return chS;
 }
 
+function cleanChordtext(text) {
+  for (let i = text.length -1; i > 0; i--) {
+    if (! text[i].toUpperCase().match("[a-h]|m|#")) {
+      text.slice(i);
+    }
+  }
+  return text;
+}
+
 function chordToNotes(rootNum, pos) {
   if(rootNum < 0)
     rootNum += notes.length;
