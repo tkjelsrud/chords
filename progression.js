@@ -3,13 +3,23 @@ const commonProgRaw = {
   'test2': 'I V ♭VII IV',
 };
 
+const chordToRelativeNumber = {
+    'I': 0,
+    'II': 2,
+    'III': 4,
+    'IV': 5,
+    'V': 7,
+    'VI': 9,
+    'VII': 11,
+};
+
 // This quickly becomes complex, need to match progression labels to potential key, but key could be any to match
 // Maybe a easier way is to measure the distance between the chords?
 
 function progressionToDistance(progList) {
-  let distList = new Array();
-
-  return distList;
+  const relations = progList.map(chord => chordToRelativeNumber[chord.toUpperCase()]);
+  
+  return relations;
 }
 
 function chordsToProgressions(chordList) {
