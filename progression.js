@@ -1,6 +1,6 @@
 const commonProgRaw = {
-  'minor': 'i ii III iv v VI VII', // ii is iidim, removed for testing
-  'major': 'I ii iii IV V vi vii', // vii is viidim
+  'minor': 'i iidim III iv v VI VII',
+  'major': 'I ii iii IV V vi viidim',
   'test': 'I V vi IV',
   'test2': 'I V ♭VII IV',
 };
@@ -8,6 +8,7 @@ const commonProgRaw = {
 const chordToRelativeNumber = {
     'I': 0,
     'ii': 1.9,
+    'iidim': 1.9,
     'II': 2,
     'iii': 3.9,
     'III': 4,
@@ -20,8 +21,20 @@ const chordToRelativeNumber = {
     'VI': 9,
     '♭VII': 10,
     'vii': 10.9,
+    'viidim': 10.9,
     'VII': 11,
 };
+/*const romanToTone = {
+    'I': [0, ''],
+    'i': [0, 'm'],
+    'ii': [2, 'm'],
+    'II': [2, ''],
+    'iii': [3, 'm'],
+    'III': [3, ''],
+    'iv': [4, 'm'],
+    'IV': [4, ''],
+    '
+};*/
 const allStartingChords = {
   "C": 0,
   "C#": 1,
@@ -41,6 +54,30 @@ const allStartingChords = {
   "Bb": 10,
   "B": 11
 };
+
+function isUpperCase(str) {
+    return str === str.toUpperCase();
+}
+
+function getKeyByValue(obj, value) {
+    return Object.keys(obj)
+           .filter(key => obj[key] === value);
+}
+
+function createChordSequence(progression, transpose = 0) {
+  const relatives = progression.map(chord => Math.round(chordToRelativeNumber[chord]));
+  let res = new Array(progression.length);
+  
+  for(let i = 0; i < relatives.length; i++) {
+    let m = (!isUpperCase(progression[i]) ? 'm': '');
+    if(progressions[i].endsWidth('dim')
+       m = 'dim';
+    
+    res[i] = getKeyByValue(allStartingChords, (relatives[i] + transpose) % 12)[0] + m;
+  }
+
+  return res;
+}
 
 // This quickly becomes complex, need to match progression labels to potential key, but key could be any to match
 // Maybe a easier way is to measure the distance between the chords?
