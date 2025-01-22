@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chord Progression Tool</title>
+  <script src="https://cdn.jsdelivr.net/npm/vexchords"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -44,7 +45,6 @@
     }
 
     .chord-diagram {
-      width: 100%;
       margin-top: 8px;
     }
   </style>
@@ -52,52 +52,51 @@
 <body>
   <h1>Chord Progression Tool</h1>
   <div class="chord-container">
-    <!-- Chord boxes go here -->
+    <!-- Chord boxes will be rendered here -->
   </div>
 
   <script>
     // Chord data
     const chords = [
-      { name: "Cmaj7", diagram: "M000200" },
-      { name: "Am", diagram: "022000" },
-      { name: "Em", diagram: "022100" },
+      {
+        name: "Cmaj7",
+        diagram: {
+          strings: [0, 3, 2, 0, 0, 0], // Frets
+          fingers: [null, 3, 2, null, null, null], // Finger positions
+        },
+      },
+      {
+        name: "Am",
+        diagram: {
+          strings: [0, 0, 2, 2, 1, 0],
+          fingers: [null, null, 2, 3, 1, null],
+        },
+      },
+      {
+        name: "Em",
+        diagram: {
+          strings: [0, 2, 2, 0, 0, 0],
+          fingers: [null, 2, 3, null, null, null],
+        },
+      },
     ];
 
-    const chordDiagrams = {
-      Cmaj7: `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" class="chord-diagram">
-          <rect x="10" y="10" width="40" height="80" fill="none" stroke="black" />
-          <circle cx="20" cy="30" r="5" fill="black" />
-          <circle cx="30" cy="50" r="5" fill="black" />
-          <circle cx="40" cy="70" r="5" fill="black" />
-        </svg>
-      `,
-      Am: `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" class="chord-diagram">
-          <rect x="10" y="10" width="40" height="80" fill="none" stroke="black" />
-          <circle cx="20" cy="50" r="5" fill="black" />
-          <circle cx="30" cy="30" r="5" fill="black" />
-        </svg>
-      `,
-      Em: `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" class="chord-diagram">
-          <rect x="10" y="10" width="40" height="80" fill="none" stroke="black" />
-          <circle cx="30" cy="30" r="5" fill="black" />
-          <circle cx="40" cy="50" r="5" fill="black" />
-        </svg>
-      `,
-    };
-
-    // Populate chords
+    // Render chords
     const container = document.querySelector(".chord-container");
 
     chords.forEach((chord) => {
       const chordBox = document.createElement("div");
       chordBox.className = "chord-box";
-      chordBox.innerHTML = `
-        <h3>${chord.name}</h3>
-        ${chordDiagrams[chord.name]}
-      `;
+      chordBox.innerHTML = `<h3>${chord.name}</h3>`;
+      
+      // Create SVG container
+      const svgContainer = document.createElement("div");
+      svgContainer.className = "chord-diagram";
+      chordBox.appendChild(svgContainer);
+
+      // Render chord diagram using VexChords
+      VexChords.draw(svgContainer, chord.diagram);
+
       container.appendChild(chordBox);
     });
   </script>
