@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chord Progression Tool</title>
-  <script src="https://cdn.jsdelivr.net/npm/vexchords"></script>
+  <!-- Include VexChords directly via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vexchords/dist/vexchords.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -32,7 +33,7 @@
       border-radius: 8px;
       padding: 16px;
       text-align: center;
-      width: 120px;
+      width: 150px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -56,13 +57,14 @@
   </div>
 
   <script>
-    // Chord data
+    // Chord data (name and corresponding chord diagram)
     const chords = [
       {
         name: "Cmaj7",
         diagram: {
           strings: [0, 3, 2, 0, 0, 0], // Frets
-          fingers: [null, 3, 2, null, null, null], // Finger positions
+          fingers: [null, 3, 2, null, null, null], // Finger placements
+          barres: [], // No barre
         },
       },
       {
@@ -70,6 +72,7 @@
         diagram: {
           strings: [0, 0, 2, 2, 1, 0],
           fingers: [null, null, 2, 3, 1, null],
+          barres: [],
         },
       },
       {
@@ -77,26 +80,34 @@
         diagram: {
           strings: [0, 2, 2, 0, 0, 0],
           fingers: [null, 2, 3, null, null, null],
+          barres: [],
         },
       },
     ];
 
-    // Render chords
+    // Get the container where chords will be rendered
     const container = document.querySelector(".chord-container");
 
+    // Render each chord
     chords.forEach((chord) => {
+      // Create a container for each chord
       const chordBox = document.createElement("div");
       chordBox.className = "chord-box";
       chordBox.innerHTML = `<h3>${chord.name}</h3>`;
-      
-      // Create SVG container
+
+      // Create an SVG container for the chord diagram
       const svgContainer = document.createElement("div");
       svgContainer.className = "chord-diagram";
       chordBox.appendChild(svgContainer);
 
-      // Render chord diagram using VexChords
-      VexChords.draw(svgContainer, chord.diagram);
+      // Render the chord using VexChords
+      VexChords.draw(svgContainer, {
+        frets: chord.diagram.strings,
+        fingers: chord.diagram.fingers,
+        barres: chord.diagram.barres,
+      });
 
+      // Add the chord box to the main container
       container.appendChild(chordBox);
     });
   </script>
