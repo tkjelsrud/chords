@@ -3,113 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chord Progression Tool</title>
-  <!-- Include VexChords from the CDN -->
+  <title>Debug VexChords</title>
   <script src="https://cdn.jsdelivr.net/npm/vexchords/dist/vexchords.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .chord-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-      max-width: 90%;
-    }
-
-    .chord-box {
-      background: white;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      width: 150px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .chord-box h3 {
-      margin: 8px 0;
-      font-size: 16px;
-      color: #333;
-    }
-
-    .chord-diagram {
-      margin-top: 8px;
-    }
-  </style>
 </head>
 <body>
-  <h1>Chord Progression Tool</h1>
-  <div class="chord-container">
-    <!-- Chord boxes will be rendered here -->
-  </div>
+  <div id="chord-container"></div>
 
   <script>
-    // Chord data (name and corresponding chord diagram)
-    const chords = [
-      {
-        name: "Cmaj7",
-        diagram: {
-          strings: [0, 3, 2, 0, 0, 0], // Frets
-          fingers: [null, 3, 2, null, null, null], // Finger placements
-          barres: [], // No barre
-        },
-      },
-      {
-        name: "Am",
-        diagram: {
-          strings: [0, 0, 2, 2, 1, 0],
-          fingers: [null, null, 2, 3, 1, null],
-          barres: [],
-        },
-      },
-      {
-        name: "Em",
-        diagram: {
-          strings: [0, 2, 2, 0, 0, 0],
-          fingers: [null, 2, 3, null, null, null],
-          barres: [],
-        },
-      },
-    ];
+    // Debugging with one chord
+    const chordData = {
+      frets: [0, 3, 2, 0, 0, 0],
+      fingers: [null, 3, 2, null, null, null],
+      barres: [],
+    };
 
-    // Get the container where chords will be rendered
-    const container = document.querySelector(".chord-container");
+    // Target container
+    const container = document.getElementById("chord-container");
 
-    // Render each chord
-    chords.forEach((chord) => {
-      // Create a container for each chord
-      const chordBox = document.createElement("div");
-      chordBox.className = "chord-box";
-      chordBox.innerHTML = `<h3>${chord.name}</h3>`;
-
-      // Create an SVG container for the chord diagram
-      const svgContainer = document.createElement("div");
-      svgContainer.className = "chord-diagram";
-      chordBox.appendChild(svgContainer);
-
-      // Render the chord using vexchords (all lowercase!)
-      vexchords.draw(svgContainer, {
-        frets: chord.diagram.strings,
-        fingers: chord.diagram.fingers,
-        barres: chord.diagram.barres,
-      });
-
-      // Add the chord box to the main container
-      container.appendChild(chordBox);
-    });
+    // Render the chord
+    try {
+      vexchords.draw(container, chordData);
+      console.log("Chord rendered successfully");
+    } catch (error) {
+      console.error("Error rendering chord:", error);
+    }
   </script>
 </body>
 </html>
