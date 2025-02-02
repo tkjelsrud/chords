@@ -1,0 +1,155 @@
+C Major, C, Dm, Em, F, G, Am, Bdim
+Db Major, Db, Ebm, Fm, Gb, Ab, Bbm, Cdim
+D Major, D, Em, F#m, G, A, Bm, C#dim
+Eb Major, Eb, Fm, Gm, Ab, Bb, Cm, Ddim
+E Major, E, F#m, G#m, A, B, C#m, D#dim
+F Major, F, Gm, Am, Bb, C, Dm, Edim
+Gb Major, Gb, Abm, Bbm, Cb, Db, Ebm, Fdim
+G Major, G, Am, Bm, C, D, Em, F#dim
+Ab Major, Ab, Bbm, Cm, Db, Eb, Fm, Gdim
+A Major, A, Bm, C#m, D, E, F#m, G#dim
+Bb Major, Bb, Cm, Dm, Eb, F, Gm, Adim
+B Major, B, C#m, D#m, E, F#, G#m, A#dim
+
+C Major, Cmaj7, Dm7, Em7, Fmaj7, G7, Am7, Bm7b5
+Db Major, Dbmaj7, Ebm7, Fm7, Gbmaj7, Ab7, Bbm7, Cm7b5
+D Major, Dmaj7, Em7, F#m7, Gmaj7, A7, Bm7, C#m7b5
+Eb Major, Ebmaj7, Fm7, Gm7, Abmaj7, Bb7, Cm7, Dm7b5
+E Major, Emaj7, F#m7, G#m7, Amaj7, B7, C#m7, D#m7b5
+F Major, Fmaj7, Gm7, Am7, Bbmaj7, C7, Dm7, Em7b5
+Gb Major, Gbmaj7, Abm7, Bbm7, Cbmaj7, Db7, Ebm7, Fm7b5
+G Major, Gmaj7, Am7, Bm7, Cmaj7, D7, Em7, F#m7b5
+Ab Major, Abmaj7, Bbm7, Cm7, Dbmaj7, Eb7, Fm7, Gm7b5
+A Major, Amaj7, Bm7, C#m7, Dmaj7, E7, F#m7, G#m7b5
+Bb Major, Bbmaj7, Cm7, Dm7, Ebmaj7, F7, Gm7, Am7b5
+B Major, Bmaj7, C#m7, D#m7, Emaj7, F#7, G#m7, A#m7b5
+
+C Minor, Cm7, Dm7b5, Ebmaj7, Fm7, Gm7, Abmaj7, Bb7
+C# Minor, C#m7, D#m7b5, Emaj7, F#m7, G#m7, Amaj7, B7
+D Minor, Dm7, Em7b5, Fmaj7, Gm7, Am7, Bbmaj7, C7
+Eb Minor, Ebm7, Fm7b5, Gbmaj7, Abm7, Bbm7, Cbmaj7, Db7
+E Minor, Em7, F#m7b5, Gmaj7, Am7, Bm7, Cmaj7, D7
+F Minor, Fm7, Gm7b5, Abmaj7, Bbm7, Cm7, Dbmaj7, Eb7
+F# Minor, F#m7, G#m7b5, Amaj7, Bm7, C#m7, Dmaj7, E7
+G Minor, Gm7, Am7b5, Bbmaj7, Cm7, Dm7, Ebmaj7, F7
+G# Minor, G#m7, A#m7b5, Bmaj7, C#m7, D#m7, Emaj7, F#7
+A Minor, Am7, Bm7b5, Cmaj7, Dm7, Em7, Fmaj7, G7
+Bb Minor, Bbm7, Cm7b5, Dbmaj7, Ebm7, Fm7, Gbmaj7, Ab7
+B Minor, Bm7, C#m7b5, Dmaj7, Em7, F#m7, Gmaj7, A7
+
+C Minor, Cm, Ddim, Eb, Fm, Gm, Ab, Bb
+C# Minor, C#m, D#dim, E, F#m, G#m, A, B
+D Minor, Dm, Edim, F, Gm, Am, Bb, C
+Eb Minor, Ebm, Fdim, Gb, Abm, Bbm, Cb, Db
+E Minor, Em, F#dim, G, Am, Bm, C, D
+F Minor, Fm, Gdim, Ab, Bbm, Cm, Db, Eb
+F# Minor, F#m, G#dim, A, Bm, C#m, D, E
+G Minor, Gm, Adim, Bb, Cm, Dm, Eb, F
+G# Minor, G#m, A#dim, B, C#m, D#m, E, F#
+A Minor, Am, Bdim, C, Dm, Em, F, G
+Bb Minor, Bbm, Cdim, Db, Ebm, Fm, Gb, Ab
+B Minor, Bm, C#dim, D, Em, F#m, G, A
+
+C Dorian, Cm, Dm, Eb, F, Gm, Am, Bb
+Db Dorian, Dbm, Ebm, E, Gb, Abm, Bbm, Cb
+D Dorian, Dm, Em, F, G, Am, Bm, C
+Eb Dorian, Ebm, Fm, Gb, Ab, Bbm, Cm, Db
+E Dorian, Em, F#m, G, A, Bm, C#m, D
+F Dorian, Fm, Gm, Ab, Bb, Cm, Dm, Eb
+Gb Dorian, Gbm, Abm, A, B, Dbm, Ebm, Gb
+G Dorian, Gm, Am, Bb, C, Dm, Em, F
+Ab Dorian, Abm, Bbm, B, Db, Ebm, Fm, Gb
+A Dorian, Am, Bm, C, D, Em, F#m, G
+Bb Dorian, Bbm, Cm, Db, Eb, Fm, Gm, Ab
+B Dorian, Bm, C#m, D, E, F#m, G#m, A
+
+C Mixolydian, C, Dm, Em, F, G, Am, Bb
+Db Mixolydian, Db, Ebm, Fm, Gb, Ab, Bbm, Cb
+D Mixolydian, D, Em, F#m, G, A, Bm, C
+Eb Mixolydian, Eb, Fm, Gm, Ab, Bb, Cm, Db
+E Mixolydian, E, F#m, G#m, A, B, C#m, D
+F Mixolydian, F, Gm, Am, Bb, C, Dm, Eb
+Gb Mixolydian, Gb, Abm, Bbm, Cb, Db, Ebm, Fb
+G Mixolydian, G, Am, Bm, C, D, Em, F
+Ab Mixolydian, Ab, Bbm, Cm, Db, Eb, Fm, Gb
+A Mixolydian, A, Bm, C#m, D, E, F#m, G
+Bb Mixolydian, Bb, Cm, Dm, Eb, F, Gm, Ab
+B Mixolydian, B, C#m, D#m, E, F#, G#m, A
+
+C Lydian, C, D, Em, F#, G, Am, Bm
+Db Lydian, Db, Eb, Fm, G, Ab, Bbm, Cm
+D Lydian, D, E, F#m, G#, A, Bm, C#m
+Eb Lydian, Eb, F, Gm, A, Bb, Cm, Dm
+E Lydian, E, F#, G#m, A#, B, C#m, D#m
+F Lydian, F, G, Am, B, C, Dm, Em
+Gb Lydian, Gb, Ab, Bbm, C, Db, Ebm, Fm
+G Lydian, G, A, Bm, C#, D, Em, F#m
+Ab Lydian, Ab, Bb, Cm, D, Eb, Fm, Gm
+A Lydian, A, B, C#m, D#, E, F#m, G#m
+Bb Lydian, Bb, C, Dm, E, F, Gm, Am
+B Lydian, B, C#, D#m, E#, F#, G#m, A#m
+
+C Phrygian, Cm, Db, Eb, Fm, Gm, Ab, Bb
+Db Phrygian, Dbm, D, E, Gbm, Abm, A, B
+D Phrygian, Dm, Eb, F, Gm, Am, Bb, C
+Eb Phrygian, Ebm, Fb, Gb, Abm, Bbm, Cb, Db
+E Phrygian, Em, F, G, Am, Bm, C, D
+F Phrygian, Fm, Gb, Ab, Bbm, Cm, Db, Eb
+Gb Phrygian, Gbm, G, A, Bm, Dbm, D, E
+G Phrygian, Gm, Ab, Bb, Cm, Dm, Eb, F
+Ab Phrygian, Abm, A, B, Dbm, Ebm, E, Gb
+A Phrygian, Am, Bb, C, Dm, Em, F, G
+Bb Phrygian, Bbm, Cb, Db, Ebm, Fm, Gb, Ab
+B Phrygian, Bm, C, D, Em, F#m, G, A
+
+C Aeolian, Cm, Ddim, Eb, Fm, Gm, Ab, Bb
+Db Aeolian, Dbm, Ebdim, E, Gbm, Abm, A, B
+D Aeolian, Dm, Edim, F, Gm, Am, Bb, C
+Eb Aeolian, Ebm, Fdim, Gb, Abm, Bbm, Cb, Db
+E Aeolian, Em, F#dim, G, Am, Bm, C, D
+F Aeolian, Fm, Gdim, Ab, Bbm, Cm, Db, Eb
+Gb Aeolian, Gbm, Abdim, A, Bm, Dbm, D, E
+G Aeolian, Gm, Adim, Bb, Cm, Dm, Eb, F
+Ab Aeolian, Abm, Bbdim, B, Dbm, Ebm, E, Gb
+A Aeolian, Am, Bdim, C, Dm, Em, F, G
+Bb Aeolian, Bbm, Cdim, Db, Ebm, Fm, Gb, Ab
+B Aeolian, Bm, C#dim, D, Em, F#m, G, A
+
+C Locrian, Cm, Db, Eb, Fm, Gb, Ab, Bb
+Db Locrian, Dbm, D, E, Gbm, A, B, C
+D Locrian, Dm, Eb, F, Gm, Ab, Bb, C
+Eb Locrian, Ebm, Fb, Gb, Abm, Bbm, Cb, Db
+E Locrian, Em, F, G, Am, Bb, C, D
+F Locrian, Fm, Gb, Ab, Bbm, Cb, Db, Eb
+Gb Locrian, Gbm, G, A, Bm, Dbm, D, E
+G Locrian, Gm, Ab, Bb, Cm, Db, Eb, F
+Ab Locrian, Abm, A, B, Dbm, Ebm, E, Gb
+A Locrian, Am, Bb, C, Dm, Eb, F, G
+Bb Locrian, Bbm, Cb, Db, Ebm, Fm, Gb, Ab
+B Locrian, Bm, C, D, Em, F, G, A
+
+C Harmonic Minor, Cm, Ddim, Eb, Fm, G, Ab, Bdim
+Db Harmonic Minor, Dbm, Ebdim, E, Gbm, Ab, Cdim
+D Harmonic Minor, Dm, Edim, F, Gm, A, Bb, C#dim
+Eb Harmonic Minor, Ebm, Fdim, Gb, Abm, Bb, C, Ddim
+E Harmonic Minor, Em, F#dim, G, Am, B, C, D#dim
+F Harmonic Minor, Fm, Gdim, Ab, Bbm, C, Db, Edim
+Gb Harmonic Minor, Gbm, Abdim, A, Bm, Db, Edim
+G Harmonic Minor, Gm, Adim, Bb, Cm, D, Eb, F#dim
+Ab Harmonic Minor, Abm, Bbdim, B, Dbm, Eb, Gb, Gdim
+A Harmonic Minor, Am, Bdim, C, Dm, E, F, G#dim
+Bb Harmonic Minor, Bbm, Cdim, Db, Ebm, F, Gb, Adim
+B Harmonic Minor, Bm, C#dim, D, Em, F#, G, A#dim
+
+C Melodic Minor, Cm, Dm, Eb, F, G, A, Bdim
+Db Melodic Minor, Dbm, Ebm, E, Gb, Ab, Bb, Cdim
+D Melodic Minor, Dm, Em, F, G, A, B, C#dim
+Eb Melodic Minor, Ebm, Fm, Gb, Ab, Bb, C, Ddim
+E Melodic Minor, Em, F#m, G, A, B, C#, D#dim
+F Melodic Minor, Fm, Gm, Ab, Bb, C, D, Edim
+Gb Melodic Minor, Gbm, Abm, A, B, Db, Eb, Fdim
+G Melodic Minor, Gm, Am, Bb, C, D, E, F#dim
+Ab Melodic Minor, Abm, Bbm, B, Db, Eb, F, Gdim
+A Melodic Minor, Am, Bm, C, D, E, F#, G#dim
+Bb Melodic Minor, Bbm, Cm, Db, Eb, F, G, Adim
+B Melodic Minor, Bm, C#m, D, E, F#, G#, A#dim

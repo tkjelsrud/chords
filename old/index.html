@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chord Diagram PoC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .diagram-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    svg {
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chord Diagram PoC</h1>
+  <div class="controls">
+    <button onclick="drawDiagram('guitar')">Guitar</button>
+    <button onclick="drawDiagram('bass')">Bass</button>
+    <button onclick="drawDiagram('piano')">Piano</button>
+  </div>
+  <div class="diagram-container" id="diagram-container"></div>
+
+  <script>
+    // Data for different instruments
+    const instruments = {
+      guitar: {
+        name: "E Major",
+        strings: 6,
+        frets: 4,
+        positions: [
+          { string: 6, fret: 0 }, // Open E
+          { string: 5, fret: 2 },
+          { string: 4, fret: 2 },
+          { string: 3, fret: 1 },
+          { string: 2, fret: 0 },
+          { string: 1, fret: 0 },
+        ],
+      },
+      bass: {
+        name: "E Major",
+        strings: 4,
+        frets: 4,
+        positions: [
+          { string: 4, fret: 0 },
+          { string: 3, fret: 2 },
+          { string: 2, fret: 2 },
+          { string: 1, fret: 1 },
+        ],
+      },
+      piano: {
+        name: "C Major",
+        keys: ["C", "E", "G"], // Highlighted keys
+      },
+    };
+
+    // Draw diagram
+    function drawDiagram(instrument) {
+      const container = document.getElementById("diagram-container");
+      container.innerHTML = ""; // Clear previous diagram
+
+      if (instrument === "piano") {
+        drawPianoDiagram(container, instruments[instrument]);
+      } else {
+        drawStringInstrumentDiagram(container, instruments[instrument]);
+      }
+    }
+
+    // Draw string instrument diagrams (guitar, bass)
+    function drawStringInstrumentDiagram(container, { name, strings, frets, positions }) {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const width = 200;
+      const height = 300;
+      const stringSpacing = width / (strings + 1);
+      const fretSpacing = height / (frets + 1);
+
+      svg.setAttribute("width", width);
+      svg.setAttribute("height", height);
+
+      // Draw frets
+      for (let i = 1; i <= frets; i++) {
+        const y = i * fretSpacing;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", stringSpacing);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", width - stringSpacing);
+        line.setAttribute("y2", y);
+        line.setAttribute("stroke", "#ccc");
+        line.setAttribute("stroke-width", 2);
+        svg.appendChild(line);
+      }
+
+      // Draw strings
+      for (let i = 1; i <= strings; i++) {
+        const x = i * stringSpacing;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", fretSpacing);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", height - fretSpacing);
+        line.setAttribute("stroke", "#ccc");
+        line.setAttribute("stroke-width", 2);
+        svg.appendChild(line);
+      }
+
+      // Draw positions
+      positions.forEach(({ string, fret }) => {
+        const cx = string * stringSpacing;
+        const cy = fret * fretSpacing;
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", cx);
+        circle.setAttribute("cy", cy);
+        circle.setAttribute("r", 8);
+        circle.setAttribute("fill", "black");
+        svg.appendChild(circle);
+      });
+
+      container.appendChild(svg);
+    }
+
+    // Draw piano diagrams
+    function drawPianoDiagram(container, { name, keys }) {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const width = 300;
+      const height = 150;
+      const keyWidth = width / 7; // 7 white keys
+      const keyHeight = height;
+
+      svg.setAttribute("width", width);
+      svg.setAttribute("height", height);
+
+      // Draw white keys
+      for (let i = 0; i < 7; i++) {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", i * keyWidth);
+        rect.setAttribute("y", 0);
+        rect.setAttribute("width", keyWidth);
+        rect.setAttribute("height", keyHeight);
+        rect.setAttribute("fill", keys.includes(["C", "D", "E", "F", "G", "A", "B"][i]) ? "#aaa" : "#fff");
+        rect.setAttribute("stroke", "#000");
+        svg.appendChild(rect);
+      }
+
+      container.appendChild(svg);
+    }
+
+    // Initialize with guitar
+    drawDiagram("guitar");
+  </script>
+</body>
+</html>

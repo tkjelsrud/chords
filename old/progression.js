@@ -60,7 +60,7 @@ function createChordSequence(progression, transpose = 0) {
   
   for(let i = 0; i < relatives.length; i++) {
     let m = (!isUpperCase(progression[i]) ? 'm': '');
-    if(progressions[i].endsWidth('dim')
+    if(progressions[i].endsWidth('dim'))
        m = 'dim';
     
     res[i] = getKeyByValue(allStartingChords, (relatives[i] + transpose) % 12)[0] + m;
