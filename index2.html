@@ -9,24 +9,21 @@
             font-family: Arial, sans-serif;
         }
         #chordEditor {
-            width: 100%;
             min-height: 150px;
-            padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 10px;
             font-size: 18px;
-            white-space: pre-wrap;
             outline: none;
+            white-space: pre-wrap;
             cursor: text;
         }
+
         .chord {
-            display: inline-block;  /* Prevents accidental breaking */
-            padding: 2px 4px;
-            border-radius: 4px;
-            background: rgba(42, 157, 143, 0.1);
             font-weight: bold;
             color: #2a9d8f;
-            white-space: nowrap;  /* Ensures F#7 remains a single unit */
+            background: rgba(42, 157, 143, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
         }
         .accidental {
             display: inline-block;
@@ -91,8 +88,62 @@
 
     <script src="lib/lib.js"></script>
     <script>
+        document.addEventListener("DOMContentLoaded", () => {   
+        const editor = document.getElementById("chordEditor");
+            // Automatically format chords as the user types
+            const observer = new MutationObserver(() => {
+                formatChords();
+            });
 
-        document.addEventListener("DOMContentLoaded", function () {
+            observer.observe(editor, { childList: true, subtree: true, characterData: true });
+
+            editor.addEventListener("input", () => {
+                formatChords(); // Format only newly typed chords
+            });
+
+            function updateSidebarResults(text) {
+                let sidebar = document.getElementById("resultsSidebar");
+                sidebar.innerHTML = ""; // Clear previous results
+
+                let lines = text.split("\n").filter(line => line.trim() !== "");
+                lines.forEach((line, index) => {
+                    let chords = getChordMatches(line.split(/\s+/));
+                    //console.log(chords);
+                    if (chords.length > 0) {
+                        let resultDiv = document.createElement("div");
+                        resultDiv.innerHTML = `<strong>Line ${index + 1}</strong><br>${chords.slice(0, 2).map(chord => `${chord.key} (Score: ${chord.score.toFixed(1)})`).join("<br>")}`;
+                        sidebar.appendChild(resultDiv);
+                    }
+                });
+            }
+
+            function formatChords() {
+                let selection = window.getSelection();
+                let range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+                let textNodes = [...editor.childNodes].filter(node => node.nodeType === 3);
+                textNodes.forEach(node => {
+                    let formatted = node.textContent.replace(/\b([A-G](?:#|b|♯|♭)?(?:maj7|m7|m|7|dim|sus[24]?)?)\b/g, match => {
+                        return `<span class="chord">${match}</span>`;
+                    });
+
+                    if (node.textContent !== formatted) {
+                        let temp = document.createElement("span");
+                        temp.innerHTML = formatted;
+                        node.replaceWith(...temp.childNodes);
+                    }
+                });
+
+                if (range) {
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+
+                updateSidebarResults(editor.innerText.trim()); // Keep sidebar results updated
+            }
+        });
+
+        /*document.addEventListener("DOMContentLoaded", function () {
             const editor = document.getElementById("chordEditor");
 
             function formatChord(chord) {
@@ -108,66 +159,6 @@
                 formattedChord = formattedChord.replace(/b$/, "♭").replace(/#$/, "♯");
 
                 return enharmonicMap[formattedChord] || formattedChord;
-            }
-
-            function getCaretPosition(el) {
-                let selection = window.getSelection();
-                if (selection.rangeCount === 0) return 0;
-                let range = selection.getRangeAt(0);
-                let preCaretRange = range.cloneRange();
-                preCaretRange.selectNodeContents(el);
-                preCaretRange.setEnd(range.endContainer, range.endOffset);
-                return preCaretRange.toString().length;
-            }
-
-            function setCaretPosition(el, pos) {
-                let selection = window.getSelection();
-                let range = document.createRange();
-                let currentNode = el;
-                let currentPos = 0;
-
-                function traverseNodes(node) {
-                    if (node.nodeType === 3) { // Text node
-                        let nextPos = currentPos + node.length;
-                        if (nextPos >= pos) {
-                            range.setStart(node, pos - currentPos);
-                            range.setEnd(node, pos - currentPos);
-                            selection.removeAllRanges();
-                            selection.addRange(range);
-                            return true;
-                        }
-                        currentPos = nextPos;
-                    } else {
-                        for (let child of node.childNodes) {
-                            if (traverseNodes(child)) return true;
-                        }
-                    }
-                    return false;
-                }
-
-                traverseNodes(currentNode);
-            }
-
-            let debounceTimeout = null;
-            function highlightChords() {
-                if (debounceTimeout) clearTimeout(debounceTimeout);
-
-                debounceTimeout = setTimeout(() => {
-                    let caretPos = getCaretPosition(editor); // 🔹 Save cursor position
-                    let text = editor.innerText.trim(); // Keep raw text
-                    
-                    // 🔹 Replace only matching chords, avoid full overwrites
-                    let formattedText = text.replace(/\b([A-G](?:#|b|♯|♭)?(?:maj7|m7|m|7|dim|sus[24]?)?)\b/g, match => {
-                        return `<span class="chord">${formatChord(match)}</span>`; 
-                    });
-
-                    if (editor.innerHTML !== formattedText) {
-                        editor.innerHTML = formattedText;
-                        setCaretPosition(editor, caretPos); // 🔹 Restore cursor position
-                    }
-
-                    updateSidebarResults(text);
-                }, 200); // Debounced for smooth updates
             }
 
             function updateSidebarResults(text) {
@@ -217,7 +208,7 @@
             loadChordData();
 
             editor.addEventListener("input", highlightChords);
-        });
+        });*/
     </script>
 
 </body>
