@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chord Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #chordEditor {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 18px;
+            white-space: pre-wrap;
+            outline: none;
+            cursor: text;
+        }
+        .chord {
+            display: inline-block;  /* Prevents accidental breaking */
+            padding: 2px 4px;
+            border-radius: 4px;
+            background: rgba(42, 157, 143, 0.1);
+            font-weight: bold;
+            color: #2a9d8f;
+            white-space: nowrap;  /* Ensures F#7 remains a single unit */
+        }
+        .accidental {
+            display: inline-block;
+            width: auto;
+        }
+        .chord-results {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            max-width: 220px;
+            max-height: 40px; /* Ensure minimal space usage */
+            overflow: hidden;
+            text-align: center;
+            white-space: nowrap;
+            line-height: 1.2;
+            z-index: 10;
+            transform: translateY(-120%); /* Move results *above* the line */
+            opacity: 0.9;
+        }
+        .line {
+            position: relative; /* Needed for absolute positioning */
+            padding-top: 15px; /* Space for floating results */
+        }
+
+        #editor-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        #chordEditor {
+            flex: 2;
+            min-height: 150px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-size: 18px;
+            white-space: pre-wrap;
+            outline: none;
+            cursor: text;
+        }
+
+        #resultsSidebar {
+            flex: 1;
+            background: #f4f4f4;
+            padding: 10px;
+            border-left: 2px solid #ddd;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <h2>Interactive Chord Editor</h2>
+    <div id="editor-container">
+        <div id="chordEditor" contenteditable="true" spellcheck="false"></div>
+        <div id="resultsSidebar"></div>
+    </div>
+
+    <script src="lib/lib.js"></script>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const editor = document.getElementById("chordEditor");
+
+            function formatChord(chord) {
+                const enharmonicMap = {
+                    "C#": "Db", "Db": "C#",
+                    "D#": "Eb", "Eb": "D#",
+                    "F#": "Gb", "Gb": "F#",
+                    "G#": "Ab", "Ab": "G#",
+                    "A#": "Bb", "Bb": "A#"
+                };
+
+                let formattedChord = chord.charAt(0).toUpperCase() + chord.slice(1).toLowerCase();
+                formattedChord = formattedChord.replace(/b$/, "♭").replace(/#$/, "♯");
+
+                return enharmonicMap[formattedChord] || formattedChord;
+            }
+
+            function getCaretPosition(el) {
+                let selection = window.getSelection();
+                if (selection.rangeCount === 0) return 0;
+                let range = selection.getRangeAt(0);
+                let preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(el);
+                preCaretRange.setEnd(range.endContainer, range.endOffset);
+                return preCaretRange.toString().length;
+            }
+
+            function setCaretPosition(el, pos) {
+                let selection = window.getSelection();
+                let range = document.createRange();
+                let currentNode = el;
+                let currentPos = 0;
+
+                function traverseNodes(node) {
+                    if (node.nodeType === 3) { // Text node
+                        let nextPos = currentPos + node.length;
+                        if (nextPos >= pos) {
+                            range.setStart(node, pos - currentPos);
+                            range.setEnd(node, pos - currentPos);
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                            return true;
+                        }
+                        currentPos = nextPos;
+                    } else {
+                        for (let child of node.childNodes) {
+                            if (traverseNodes(child)) return true;
+                        }
+                    }
+                    return false;
+                }
+
+                traverseNodes(currentNode);
+            }
+
+            let debounceTimeout = null;
+            function highlightChords() {
+                if (debounceTimeout) clearTimeout(debounceTimeout);
+
+                debounceTimeout = setTimeout(() => {
+                    let caretPos = getCaretPosition(editor); // 🔹 Save cursor position
+                    let text = editor.innerText.trim(); // Keep raw text
+                    
+                    // 🔹 Replace only matching chords, avoid full overwrites
+                    let formattedText = text.replace(/\b([A-G](?:#|b|♯|♭)?(?:maj7|m7|m|7|dim|sus[24]?)?)\b/g, match => {
+                        return `<span class="chord">${formatChord(match)}</span>`; 
+                    });
+
+                    if (editor.innerHTML !== formattedText) {
+                        editor.innerHTML = formattedText;
+                        setCaretPosition(editor, caretPos); // 🔹 Restore cursor position
+                    }
+
+                    updateSidebarResults(text);
+                }, 200); // Debounced for smooth updates
+            }
+
+            function updateSidebarResults(text) {
+                let sidebar = document.getElementById("resultsSidebar");
+                sidebar.innerHTML = ""; // Clear previous results
+
+                let lines = text.split("\n").filter(line => line.trim() !== "");
+                lines.forEach((line, index) => {
+                    let chords = getChordMatches(line.split(/\s+/));
+                    if (chords.length > 0) {
+                        let resultDiv = document.createElement("div");
+                        resultDiv.innerHTML = `<strong>Line ${index + 1}</strong><br>${chords.slice(0, 2).map(chord => `${chord.key} (Score: ${chord.score.toFixed(1)})`).join("<br>")}`;
+                        sidebar.appendChild(resultDiv);
+                    }
+                });
+            }
+
+            // Prevent runaway UI updates
+            function showChordResults(lineElement, chords) {
+                let resultsContainer = lineElement.querySelector(".chord-results");
+
+                if (!resultsContainer) {
+                    resultsContainer = document.createElement("div");
+                    resultsContainer.classList.add("chord-results");
+                    lineElement.appendChild(resultsContainer);
+                }
+
+                // Limit results to top 2 matches
+                let topResults = chords.slice(0, 2);
+
+                if (topResults.length === 0) {
+                    resultsContainer.style.display = "none";
+                    return;
+                }
+
+                resultsContainer.innerHTML = topResults
+                    .map(chord => `${chord.key} (Score: ${chord.score.toFixed(1)})`)
+                    .join("<br>");
+
+                resultsContainer.style.display = "block";
+            }
+            // Ensure chords stay in one unit
+            function formatChord(chord) {
+                return chord.replace(/#/g, '♯').replace(/b/g, '♭');
+            }
+
+            loadChordData();
+
+            editor.addEventListener("input", highlightChords);
+        });
+    </script>
+
+</body>
+</html>
