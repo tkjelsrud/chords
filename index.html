@@ -3,33 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Line Chord Finder</title>
+    <title>Chord Editor</title>
     <style>
-        textarea {
-            width: 100%;
-            height: 120px;
-            font-family: monospace;
+        body {
+            font-family: Arial, sans-serif;
         }
-        .result-section {
-            margin-top: 10px;
+
+        .chord {
+            font-weight: bold;
+            color: #2a9d8f;
+            background: rgba(42, 157, 143, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .accidental {
+            display: inline-block;
+            width: auto;
+        }
+        .chord-results {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            max-width: 220px;
+            max-height: 40px; /* Ensure minimal space usage */
+            overflow: hidden;
+            text-align: center;
+            white-space: nowrap;
+            line-height: 1.2;
+            z-index: 10;
+            transform: translateY(-120%); /* Move results *above* the line */
+            opacity: 0.9;
+        }
+        .line {
+            position: relative; /* Needed for absolute positioning */
+            padding-top: 15px; /* Space for floating results */
+        }
+
+        #resultsSidebar {
+            flex: 1;
+            background: #f4f4f4;
             padding: 10px;
+            border-left: 2px solid #ddd;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        #editor-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #chordEditor {
+            min-height: 150px;
             border: 1px solid #ccc;
-            background: #f9f9f9;
+            padding: 10px;
+            font-size: 18px;
+            outline: none;
+            white-space: pre-wrap;
+            cursor: text;
+            width: 100%;
+            line-height: 3; /* Adds spacing to prevent overlapping */
+        }
+
+        #floatingResultsContainer {
+            position: absolute;
+            width: 100%; /* Ensures it spans across the editor */
+            pointer-events: none; /* Prevents accidental interactions */
+        }
+
+        .chord-results {
+            position: absolute;
+            background: rgba(170, 170, 170, 0.9);
+            color: rgb(36, 77, 131);
+            padding: 4px 6px;
+            border-radius: 2px;
+            font-size: 11px;
+            max-width: 75%; /* Expands wider but doesn’t take full width */
+            min-width: 50%; /* Ensures decent readability */
+            opacity: 0.95;
+            z-index: 100;
+            transform: translateY(-100%); /* Floats above the text */
+            white-space: normal; /* Allows wrapping instead of forcing single line */
+            text-align: left; /* Aligns text naturally */
         }
     </style>
 </head>
 <body>
+
+    <h2>Interactive Chord Editor</h2>
+    <div id="editor-container">
+        <div id="chordEditor" contenteditable="true" spellcheck="false"></div>
+    </div>
+    <div id="floatingResultsContainer"></div> <!-- Holds multiple floating result boxes -->
+
     <script src="lib/lib.js"></script>
-    <h2>Chord Finder</h2>
-    <textarea id="chordInput" placeholder="Enter chord sequences, one per line..." onkeyup="searchChords()"></textarea>
-    <button onclick="searchChords()">Find Keys</button>
-
-    <div id="results"></div>
-
-
-
     <script>
-        loadChordData();
+        document.addEventListener("DOMContentLoaded", () => {   
+            const editor = document.getElementById("chordEditor");
+            const resultsContainer = document.getElementById("floatingResultsContainer");
+
+            const savedText = localStorage.getItem("chordEditorContent");
+            if (savedText) {
+                editor.innerText = savedText;
+            }
+
+            // Automatically format chords as the user types
+            const observer = new MutationObserver(() => {
+                formatChords();
+            });
+
+            observer.observe(editor, { childList: true, subtree: true, characterData: true });
+
+            editor.addEventListener("input", () => {
+                formatChords(); // Format only newly typed chords
+                localStorage.setItem("chordEditorContent", editor.innerText);
+            });
+
+            function formatChords() {
+                let selection = window.getSelection();
+                let range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+                let textNodes = [...editor.childNodes].filter(node => node.nodeType === 3);
+                textNodes.forEach(node => {
+                    let formatted = node.textContent.replace(/\b([A-G](?:#|b|♯|♭)?(?:maj7|m7|m|7|dim|sus[24]?)?)\b/g, match => {
+                        return `<span class="chord">${match}</span>`;
+                    });
+
+                    if (node.textContent !== formatted) {
+                        let temp = document.createElement("span");
+                        temp.innerHTML = formatted;
+                        node.replaceWith(...temp.childNodes);
+                    }
+                });
+
+                if (range) {
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+
+                //updateSidebarResults(editor.innerText.trim()); // Keep sidebar results updated
+                updateFloatingResults();
+            }
+
+            function updateFloatingResults() {
+                let lines = editor.innerText.split("\n").filter(line => line.trim() !== "");
+                
+                // Clear all previous floating results
+                resultsContainer.innerHTML = "";
+
+                lines.forEach((line, index) => {
+                    let chords = getChordMatches(line.split(/\s+/));
+                    console.log(chords);
+                    if (chords.length > 0) {
+                        let resultBox = document.createElement("div");
+                        resultBox.classList.add("chord-results");
+                        resultBox.innerHTML = chords.slice(0, 2) // Limit to top 2 matches
+                            .map((match, index) => {
+                                let colorStyle = index === 1 ? 'color: #888;' : 'color: #000;'; // Slightly dim second match
+
+                                let placements = match.chordPlacements
+                                    .filter(p => p.placement !== "") // Only show matched placements
+                                    .map(p => `${p.chord} (${p.placement})`) // Format chord + placement
+                                    .join(", ");
+
+                                let suggestionText = index === 0 && match.suggestions.length > 0 ? 
+                                    ` | <span style="color:#c2376f;">Suggested: ${match.suggestions.join(", ")}</span>` : "";
+
+                                return placements ? `<span style="${colorStyle}"><strong>${match.key}</strong>: ${placements}</span>${suggestionText}` : ""; // Display only if placements exist
+                            })
+                            .filter(text => text !== "")
+                            .join(" ");
+
+                        resultBox.style.top = `${-144 + (index * 54)}px`;
+                        resultsContainer.appendChild(resultBox);
+                    }
+                });
+            }
+
+            function getLineBoundingRect(container, lineIndex) {
+                let range = document.createRange();
+                let selection = window.getSelection();
+                
+                let nodes = container.childNodes;
+                let charCount = 0;
+                let targetNode = null;
+
+                nodes.forEach(node => {
+                    if (node.nodeType === 3) { // Text node
+                        let lineLength = node.textContent.length;
+                        if (charCount <= lineIndex && lineIndex < charCount + lineLength) {
+                            targetNode = node;
+                        }
+                        charCount += lineLength;
+                    }
+                });
+
+                if (targetNode) {
+                    range.setStart(targetNode, 0);
+                    range.setEnd(targetNode, targetNode.length);
+                    let rects = range.getClientRects();
+                    if (rects.length > 0) return rects[0];
+                }
+
+                return null;
+            }
+
+        });
+
     </script>
 
 </body>
