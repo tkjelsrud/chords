@@ -90,11 +90,47 @@
             white-space: normal; /* Allows wrapping instead of forcing single line */
             text-align: left; /* Aligns text naturally */
         }
+
+        .suggestion {
+            color: #c2376f;
+        }
+
+        #tabs-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .tab {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #f4f4f4;
+            border-radius: 4px;
+        }
+
+        .tab.active {
+            background: #2a9d8f;
+            color: white;
+        }
+
+        #addTab {
+            padding: 6px 12px;
+            font-size: 16px;
+            border: none;
+            background: #ddd;
+            cursor: pointer;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Interactive Chord Editor</h2>
+    <h2>Chords analyzer</h2>
+    <div id="tabs-container">
+        <button id="addTab">+</button> <!-- Button to create a new tab -->
+    </div>
     <div id="editor-container">
         <div id="chordEditor" contenteditable="true" spellcheck="false"></div>
     </div>
@@ -106,10 +142,6 @@
             const editor = document.getElementById("chordEditor");
             const resultsContainer = document.getElementById("floatingResultsContainer");
 
-            const savedText = localStorage.getItem("chordEditorContent");
-            if (savedText) {
-                editor.innerText = savedText;
-            }
 
             // Automatically format chords as the user types
             const observer = new MutationObserver(() => {
@@ -120,7 +152,6 @@
 
             editor.addEventListener("input", () => {
                 formatChords(); // Format only newly typed chords
-                localStorage.setItem("chordEditorContent", editor.innerText);
             });
 
             function formatChords() {
@@ -171,7 +202,7 @@
                                     .join(", ");
 
                                 let suggestionText = index === 0 && match.suggestions.length > 0 ? 
-                                    ` | <span style="color:#c2376f;">Suggested: ${match.suggestions.join(", ")}</span>` : "";
+                                    ` | <span class="suggestion">Try: ${match.suggestions.join(", ")}</span>` : "";
 
                                 return placements ? `<span style="${colorStyle}"><strong>${match.key}</strong>: ${placements}</span>${suggestionText}` : ""; // Display only if placements exist
                             })
@@ -214,6 +245,68 @@
 
         });
 
+        document.addEventListener("DOMContentLoaded", () => {
+            const editor = document.getElementById("chordEditor");
+            const tabsContainer = document.getElementById("tabs-container");
+            const addTabButton = document.getElementById("addTab");
+
+            let tabs = JSON.parse(localStorage.getItem("chordTabs")) || [{ name: "Untitled", content: "" }];
+            let activeTabIndex = 0;
+
+            function saveTabsToStorage() {
+                localStorage.setItem("chordTabs", JSON.stringify(tabs));
+            }
+
+            function loadTab(index) {
+                activeTabIndex = index;
+                editor.innerText = tabs[index].content;
+                updateTabUI();
+            }
+
+            function updateTabUI() {
+                tabsContainer.innerHTML = "";
+                tabs.forEach((tab, index) => {
+                    let tabElement = document.createElement("div");
+                    tabElement.classList.add("tab");
+                    if (index === activeTabIndex) tabElement.classList.add("active");
+                    tabElement.textContent = tab.name;
+                    tabElement.addEventListener("click", () => loadTab(index));
+
+                    // 🔹 Double-click to rename tab
+                    tabElement.addEventListener("dblclick", () => {
+                        let newName = prompt("Rename Tab:", tab.name);
+                        if (newName && newName.trim() !== "") {
+                            tabs[index].name = newName.trim();
+                            saveTabsToStorage();
+                            updateTabUI();
+                        }
+                    });
+
+                    tabsContainer.appendChild(tabElement);
+                });
+
+                // 🔹 Re-add the "+" button
+                tabsContainer.appendChild(addTabButton);
+            }
+
+            function createNewTab() {
+                tabs.push({ name: `Tab ${tabs.length + 1}`, content: "" });
+                saveTabsToStorage();
+                loadTab(tabs.length - 1);
+            }
+
+            // 🔹 Save editor content to the active tab
+            editor.addEventListener("input", () => {
+                tabs[activeTabIndex].content = editor.innerText;
+                saveTabsToStorage();
+            });
+
+            addTabButton.addEventListener("click", createNewTab);
+
+            // Load initial tab
+            updateTabUI();
+            loadTab(0);
+        });
     </script>
 
 </body>
