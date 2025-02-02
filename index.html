@@ -307,7 +307,37 @@
             updateTabUI();
             loadTab(0);
         });
-    </script>
 
+        let lastSentText = ""; // To prevent sending the same input repeatedly
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const editor = document.getElementById("chordEditor");
+
+            editor.addEventListener("input", () => {
+                const inputText = editor.innerText.trim();
+
+                if (inputText.length > 0 && inputText !== lastSentText) {
+                    lastSentText = inputText; // Prevent duplicate sends
+
+                    gtag('event', 'chord_input', {
+                        'event_category': 'User Input',
+                        'event_label': inputText,
+                        'value': inputText.length
+                    });
+
+                    //console.log("Sent to GA:", inputText);
+                }
+            });
+        });
+    </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1FY8T9LQ3W"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-1FY8T9LQ3W');
+    </script>
 </body>
 </html>
