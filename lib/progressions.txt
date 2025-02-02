@@ -67,14 +67,110 @@ How to Disappear Completely (D Mixolydian), D, A, Bm, G, D
 Exit Music (Bm), Bm, E, G, F#, Bm
 Weird Fishes (B Mixolydian), B, F#, A, E, B
 Pyramid Song (F#m), F#m, A, Bm, F#m, D, A, E
+Let Down (B Mixolydian), B, E, G#m, F#
+Airbag (A), A, C#m, D, G
+The National Anthem (C), C, B, Bb, A, Ab, G
 
-# Dark, Dreamy & Modal Alt-Rock Progressions
 Lover, You Should've Come Over (Jeff Buckley - E), E, C#m, A, B, G#m
 Grace (Jeff Buckley - C#), C#m, A, E, B, F#m
 Bloodbuzz Ohio (The National - D), D, G, Em, C
 Do I Wanna Know? (Arctic Monkeys - Cm), Cm, Gm, Ab, Fm
 Taro (Alt-J - Dm), Dm, C, Bb, F, Dm
 Untitled #1 (Sigur Rós - Bb Lydian), Bb, Eb, Bb, F
+Holocene (Bon Iver - C), C, F, Am, G
+Roslyn (Bon Iver & St. Vincent - Em), Em, C, G, D
+Wake Up (Arcade Fire - D), D, F#m, Bm, G, A
+Slow Show (The National - Bb), Bb, Gm, Eb, F
+
+Motion Picture Soundtrack (Radiohead - C), C, F, Am, G
+Flume (Bon Iver - E), E, A, C#m, B
+I Need My Girl (The National - Bm), Bm, D, A, G
+Skinny Love (Bon Iver - Am), Am, C, D, F
+Colony House (G), G, D, C, Em
+Hoppípolla (Sigur Rós - F), F, C, G, Am
+Viva La Vida (Coldplay - C), C, Dm, Bb, F, G
+Yellow (Coldplay - B), B, E, G#m, F#
+Mystery of Love (Sufjan Stevens - C), C, Em, F, G
+
+Maps (Yeah Yeah Yeahs - F), F, Bb, C, Dm
+Take a Breath (Explosions in the Sky - D), D, A, Bm, G
+Your Hand in Mine (Explosions in the Sky - C), C, F, G, Am
+The Only Moment We Were Alone (EITS - G), G, D, Em, C
+Anesthetic (Rival Consoles - Bm), Bm, G, A, D
+The Birth and Death of the Day (EITS - E), E, A, C#m, B
+
+Everlong (Foo Fighters - D), D, A, Bm, G
+Lithium (Nirvana - E), E, G#m, C#m, A
+Man Who Sold the World (Nirvana/D. Bowie - F), F, Bb, C, Dm
+1979 (Smashing Pumpkins - E), E, A, C#m, B
+Tonight, Tonight (Smashing Pumpkins - C), C, G, D, Em
+Santa Monica (Everclear - G), G, D, Em, C
+Paranoid Android (Radiohead - Gm), Gm, Dm, C, Bb
+
+Schism (D Phrygian), Dm, F, G, C, Dm
+The Pot (E Dorian), Em, G, A, C, D
+Lateralus (B Phrygian), Bm, C, Em, F#m, A
+Ænema (F# Phrygian), F#m, G, Bm, C#m
+Stinkfist (C Mixolydian), C, Bb, F, Eb, G
+Vicarious (D Mixolydian), D, C, Bb, F, G
+Parabola (B Phrygian), Bm, C, Em, F#m, A
+Sober (A Phrygian), Am, Bb, C, D, G
+Forty Six & 2 (E Phrygian), Em, F, G, Bm, D
+Jambi (Drop D - D Mixolydian), Dm, C, G, Bb
+
+Change (In the House of Flies - Gm), Gm, Eb, Bb, F
+Digital Bath (F# Major), F#, B, C#, D#m
+My Own Summer (Shove It - C# Phrygian), C#m, D, F#m, G#
+Be Quiet and Drive (A Major), A, D, G, Bm
+Rosemary (D Mixolydian), D, A, G, F#
+Minerva (E Phrygian), Em, F, G, B, C
+Passenger (C# Mixolydian), C#, B, A, E
+Cherry Waves (F# Aeolian), F#m, A, B, E
+Poltergeist (G Phrygian), Gm, Ab, Bb, D, F
+Leathers (C# Phrygian), C#m, D, F#m, G#
+
+Killing in the Name (D Phrygian), Dm, Eb, G, Am
+Bulls on Parade (F# Phrygian), F#m, G, B, C#
+Guerrilla Radio (Drop D - C# Phrygian), F#m, A, Em, B, C#
+Know Your Enemy (B Mixolydian), B, A, G, E
+Wake Up (E Dorian), Em, G, A, C, D
+Take the Power Back (G Mixolydian), G, F, C, Bb
+Calm Like a Bomb (D Phrygian), Dm, Eb, G, Am
+Testify (C# Mixolydian), C#, A, G, F#
+Bombtrack (F# Phrygian), F#m, G, B, C#
+Freedom (B Mixolydian), B, A, G, E
+
+Smells Like Teen Spirit (F Mixolydian), F, Bb, Ab, Db
+Come as You Are (E Dorian), Em, D, C, G
+Lithium (E Major), E, G#m, C#m, A
+Heart-Shaped Box (D Minor), Dm, F, Bb, Gm
+In Bloom (A Mixolydian), A, D, G, C
+All Apologies (D Major), D, F#m, Bm, G
+Polly (E Major), E, G, D, C
+Dumb (G Major), G, C, D, Bm
+Pennyroyal Tea (A Minor), Am, C, G, D
+You Know You're Right (C# Minor), C#m, A, G#m, B
+
+Alive (A Mixolydian), A, G, D, A
+Black (E Major), E, A, C#m, B
+Even Flow (D Major), D, G, C, Bb
+Jeremy (A Mixolydian), A, G, D, E
+Better Man (G Major), G, D, C, Em
+Rearviewmirror (E Major), E, G#m, A, B
+Daughter (G Major), G, D, C, G
+Yellow Ledbetter (E Major), E, B, A, G#m
+
+Black Hole Sun (G Major), G, Bm, C, E
+Spoonman (D Mixolydian), D, C, G, F
+Fell on Black Days (E Major), E, G, D, A
+Outshined (B Minor), Bm, G, A, F#
+Rusty Cage (E Major), E, G, A, C
+Would? (F# Minor), F#m, A, B, D
+Man in the Box (E Minor), Em, G, D, C
+Rooster (D Major), D, G, A, Bm
+Them Bones (D Mixolydian), D, C, Bb, F
+Nutshell (E Major), E, B, C#m, A
+Down in a Hole (D Major), D, G, A, Bm
 
 # More variations, using extended chords
 I-vi-IV-V6, C, Am, F, G6

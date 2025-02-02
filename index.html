@@ -84,7 +84,9 @@
             font-size: 11px;
             max-width: 75%; /* Expands wider but doesn’t take full width */
             min-width: 50%; /* Ensures decent readability */
-            opacity: 0.95;
+            opacity: 0.8;
+            border-bottom: 2px solid rgba(149, 149, 149, 0.9);
+;
             z-index: 100;
             transform: translateY(-100%); /* Floats above the text */
             white-space: normal; /* Allows wrapping instead of forcing single line */
@@ -141,6 +143,15 @@
         #details {
             font-size: 12px;
             padding-top: 20px;
+            width: 90%;
+            background-color: antiquewhite;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+        .detailhead {
+            margin-top: 8px;
+            background: rgba(170, 170, 170, 0.9);
+            border-bottom: 2px solid rgba(149, 149, 149, 0.9);
         }
         .score {
             color: #CCC;
@@ -165,7 +176,6 @@
         document.addEventListener("DOMContentLoaded", () => {   
             const editor = document.getElementById("chordEditor");
             const resultsContainer = document.getElementById("floatingResultsContainer");
-
 
             // Automatically format chords as the user types
             const observer = new MutationObserver(() => {
@@ -213,10 +223,10 @@
                 lines.forEach((line, index) => {
                     let chords = getChordMatches(line.split(/\s+/));
                     //console.log(chords);
-                    if (chords.length > 0) {
+                    if (chords.scales.length > 0) {
                         let resultBox = document.createElement("div");
                         resultBox.classList.add("chord-results");
-                        resultBox.innerHTML = chords.slice(0, 2)
+                        resultBox.innerHTML = chords.scales.slice(0, 1)
                             .map((match, index) => {
                                 let colorStyle = index === 1 ? 'color: #888;' : 'color: #000;';
                                 let placements = match.chordPlacements
@@ -234,48 +244,49 @@
 
                         resultBox.style.top = `${-144 + (index * 54)}px`;
                         //
-                        // TODO show more information
                         resultBox.onclick = function() {
                             let detailsDiv = document.getElementById("details");
                             if (!detailsDiv) return; // Ensure the div exists
 
-                            let seenProgressions = new Set(); // To track unique progressions
+                            let seenProgressions = new Set(); // Track unique progressions
 
-                            let fullDetails = chords.slice(0, 5) // Limit to top 5 results
-                                .map((match, index) => {
-                                let colorStyle = index === 1 ? 'color: #888;' : 'color: #000;';
-                                
-                                let placements = match.chordPlacements
-                                    .filter(p => p.placement !== "")
-                                    .map(p => `<strong>${p.chord}</strong> (${p.placement})`)
-                                    .join(", ");
+                            let fullDetails = chords.scales.slice(0, 5) // Limit to top 5 results
+                                .map((match) => {
+                                    // 🔹 Ensure full-scale chords are properly extracted
+                                    let keyChordsWithPlacement = match.fullScaleChords
+                                        .map(p => `<strong>${p.chord}</strong> (${p.placement || "?"})`) // 🔥 Extract **chord name** instead of object
+                                        .join(" - ");
 
-                                let suggestionText = match.suggestions.length > 0 ? 
-                                    `<br><span class="suggestion">Suggestions: ${match.suggestions.join(", ")}</span>` : "";
+                                    let suggestionText = match.suggestions.length > 0 ? 
+                                        `<br><span class="suggestion">Suggestions: ${match.suggestions.join(", ")}</span>` : "";
 
-                                // Only add unique progressions
-                                let progressionText = "";
-                                if (match.progressions && match.progressions.length > 0) {
-                                    let uniqueProgressions = match.progressions
-                                        .map(p => p.name)
-                                        .filter(p => !seenProgressions.has(p)); // Only include if not seen before
+                                    let progressionText = "";
+                                    if (chords.progressions.length > 0) {
+                                        let uniqueProgressions = chords.progressions
+                                            .filter(p => !seenProgressions.has(p.name)) // Avoid duplicates
+                                            .map(p => {
+                                                seenProgressions.add(p.name);
+                                                return `<strong>${p.name}</strong>: ${p.fullProgressionChords
+                                                    .map(p => `${p.chord} (${p.placement})`) // 🔥 Extract chords in progressions properly
+                                                    .join(" - ")}`;
+                                            });
 
-                                    uniqueProgressions.forEach(p => seenProgressions.add(p)); // Add to seen set
-
-                                    if (uniqueProgressions.length > 0) {
-                                        progressionText = `<br><span class="progressions"><strong>Similar progressions:</strong> ${uniqueProgressions.join("<br/>")}</span>`;
+                                        if (uniqueProgressions.length > 0) {
+                                            progressionText = `<br><div class="detailhead">Similar progressions</div><span class="progressions">${uniqueProgressions.join("<br/>")}</span>`;
+                                        }
                                     }
-                                }
 
-                                return `<div class="detail-item">
-                                            <span style="${colorStyle}"><strong>${match.key}</strong>: ${placements}</span> <span class="score">Score: ${match.score}</span>
-                                            ${suggestionText}
-                                            ${progressionText}
-                                        </div>`;
-                            }).join("<hr>");
+                                    return `<div class="detail-item">
+                                                <div class="detailhead">${match.key} <span class="score">Score: ${match.score}</span></div>
+                                                <div><strong>Chords in key:</strong> ${keyChordsWithPlacement}</div> <!-- 🎵 Now all chords + correct numerals -->
+                                                ${suggestionText}
+                                                ${progressionText}
+                                            </div>`;
+                                }).join("");
 
                             detailsDiv.innerHTML = fullDetails;
                         };
+                         
                         resultsContainer.appendChild(resultBox);
                     }
                 });
