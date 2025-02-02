@@ -84,7 +84,7 @@
             font-size: 11px;
             max-width: 75%; /* Expands wider but doesn’t take full width */
             min-width: 50%; /* Ensures decent readability */
-            opacity: 0.8;
+            opacity: 0.7;
             border-bottom: 2px solid rgba(149, 149, 149, 0.9);
 ;
             z-index: 100;
@@ -244,7 +244,7 @@
                                 let suggestionText = index === 0 && match.suggestions.length > 0 ? 
                                     ` | <span class="suggestion">Try: ${match.suggestions.join(", ")}</span>` : "";
 
-                                return placements ? `<span style="${colorStyle}"><strong>${match.key}</strong>: ${placements}</span>${suggestionText}` : ""; // Display only if placements exist
+                                return placements ? `<span style="${colorStyle}"><strong>${match.key}</strong>: ${placements}</span>${suggestionText}<span class="score"> [${match.score}]</span>` : ""; // Display only if placements exist
                             })
                             .filter(text => text !== "")
                             .join(" ");
@@ -284,30 +284,41 @@
                         let suggestionText = match.suggestions.length > 0 ? 
                             `<br><span class="suggestion">Suggestions: ${match.suggestions.join(", ")}</span>` : "";
 
-                        let progressionText = "";
-                        if (chords.progressions.length > 0) {
-                            let uniqueProgressions = chords.progressions
-                                .filter(p => !seenProgressions.has(p.name))
-                                .map(p => {
-                                    seenProgressions.add(p.name);
-                                    return `<strong>${p.name}</strong>: ${p.fullProgressionChords
-                                        .map(p => `${p.chord} (${p.placement})`)
-                                        .join(" - ")}`;
-                                });
-
-                            if (uniqueProgressions.length > 0) {
-                                progressionText = `<br><div class="detailhead">Similar progressions</div><span class="progressions">${uniqueProgressions.join("<br/>")}</span>`;
-                            }
-                        }
-
                         return `<div class="detail-item">
                                     <div class="detailhead">${match.key} <span class="score">Score: ${match.score}</span></div>
                                     <div><strong>Chords in key:</strong> ${keyChordsWithPlacement}</div>
                                     ${suggestionText}
-                                    ${progressionText}
                                 </div>`;
                     }).join("");
 
+                // 🔹 **Ensure progressions are only displayed ONCE**
+                let progressionText = "";
+                if (chords.progressions.length > 0) { // ✅ Only runs ONCE per search
+                    let seenProgressions = new Set();
+
+                    let uniqueProgressions = chords.progressions
+                        .filter(p => !seenProgressions.has(p.name)) // ✅ Prevent duplicates
+                        .map(p => {
+                            seenProgressions.add(p.name); // ✅ Track displayed progressions
+                            let progressionChords = p.chords || [];
+
+                            let formattedChords = progressionChords
+                                .map((chord, idx) => `<strong>${chord}</strong> (${romanNumerals[idx] || "?"})`)
+                                .join(" - ");
+
+                            return `<strong>${p.name}</strong>: ${formattedChords}`;
+                        });
+
+                    if (uniqueProgressions.length > 0) {
+                        progressionText = `<br><div class="detailhead">Similar progressions</div>
+                                        <span class="progressions">${uniqueProgressions.join("<br/>")}</span>`;
+                    }
+                }
+
+                // 🔹 Append the progression text ONCE at the bottom
+                fullDetails = progressionText + fullDetails;
+
+                // 🔹 Update details box
                 detailsDiv.innerHTML = fullDetails;
             }
 
