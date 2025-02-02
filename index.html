@@ -65,14 +65,14 @@
             outline: none;
             white-space: pre-wrap;
             cursor: text;
-            width: 100%;
+            width: 90%;
             line-height: 3; /* Adds spacing to prevent overlapping */
         }
 
         #floatingResultsContainer {
             position: absolute;
             width: 100%; /* Ensures it spans across the editor */
-            pointer-events: none; /* Prevents accidental interactions */
+            /*pointer-events: none;*/ /* Prevents accidental interactions */
         }
 
         .chord-results {
@@ -123,6 +123,29 @@
             cursor: pointer;
             border-radius: 4px;
         }
+
+        .expandable-result {
+            cursor: pointer;
+            padding: 4px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .expandable-result:hover {
+            background-color: #f4f4f4;
+        }
+
+        .hidden-details {
+            font-size: 12px;
+            padding-top: 4px;
+        }
+        #details {
+            font-size: 12px;
+            padding-top: 20px;
+        }
+        .score {
+            color: #CCC;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -136,6 +159,7 @@
     </div>
     <div id="floatingResultsContainer"></div> <!-- Holds multiple floating result boxes -->
 
+    <div id="details"></div>
     <script src="lib/lib.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {   
@@ -188,14 +212,13 @@
 
                 lines.forEach((line, index) => {
                     let chords = getChordMatches(line.split(/\s+/));
-                    console.log(chords);
+                    //console.log(chords);
                     if (chords.length > 0) {
                         let resultBox = document.createElement("div");
                         resultBox.classList.add("chord-results");
-                        resultBox.innerHTML = chords.slice(0, 2) // Limit to top 2 matches
+                        resultBox.innerHTML = chords.slice(0, 2)
                             .map((match, index) => {
-                                let colorStyle = index === 1 ? 'color: #888;' : 'color: #000;'; // Slightly dim second match
-
+                                let colorStyle = index === 1 ? 'color: #888;' : 'color: #000;';
                                 let placements = match.chordPlacements
                                     .filter(p => p.placement !== "") // Only show matched placements
                                     .map(p => `${p.chord} (${p.placement})`) // Format chord + placement
@@ -210,39 +233,53 @@
                             .join(" ");
 
                         resultBox.style.top = `${-144 + (index * 54)}px`;
+                        //
+                        // TODO show more information
+                        resultBox.onclick = function() {
+                            let detailsDiv = document.getElementById("details");
+                            if (!detailsDiv) return; // Ensure the div exists
+
+                            let seenProgressions = new Set(); // To track unique progressions
+
+                            let fullDetails = chords.slice(0, 5) // Limit to top 5 results
+                                .map((match, index) => {
+                                let colorStyle = index === 1 ? 'color: #888;' : 'color: #000;';
+                                
+                                let placements = match.chordPlacements
+                                    .filter(p => p.placement !== "")
+                                    .map(p => `<strong>${p.chord}</strong> (${p.placement})`)
+                                    .join(", ");
+
+                                let suggestionText = match.suggestions.length > 0 ? 
+                                    `<br><span class="suggestion">Suggestions: ${match.suggestions.join(", ")}</span>` : "";
+
+                                // Only add unique progressions
+                                let progressionText = "";
+                                if (match.progressions && match.progressions.length > 0) {
+                                    let uniqueProgressions = match.progressions
+                                        .map(p => p.name)
+                                        .filter(p => !seenProgressions.has(p)); // Only include if not seen before
+
+                                    uniqueProgressions.forEach(p => seenProgressions.add(p)); // Add to seen set
+
+                                    if (uniqueProgressions.length > 0) {
+                                        progressionText = `<br><span class="progressions"><strong>Similar progressions:</strong> ${uniqueProgressions.join("<br/>")}</span>`;
+                                    }
+                                }
+
+                                return `<div class="detail-item">
+                                            <span style="${colorStyle}"><strong>${match.key}</strong>: ${placements}</span> <span class="score">Score: ${match.score}</span>
+                                            ${suggestionText}
+                                            ${progressionText}
+                                        </div>`;
+                            }).join("<hr>");
+
+                            detailsDiv.innerHTML = fullDetails;
+                        };
                         resultsContainer.appendChild(resultBox);
                     }
                 });
             }
-
-            function getLineBoundingRect(container, lineIndex) {
-                let range = document.createRange();
-                let selection = window.getSelection();
-                
-                let nodes = container.childNodes;
-                let charCount = 0;
-                let targetNode = null;
-
-                nodes.forEach(node => {
-                    if (node.nodeType === 3) { // Text node
-                        let lineLength = node.textContent.length;
-                        if (charCount <= lineIndex && lineIndex < charCount + lineLength) {
-                            targetNode = node;
-                        }
-                        charCount += lineLength;
-                    }
-                });
-
-                if (targetNode) {
-                    range.setStart(targetNode, 0);
-                    range.setEnd(targetNode, targetNode.length);
-                    let rects = range.getClientRects();
-                    if (rects.length > 0) return rects[0];
-                }
-
-                return null;
-            }
-
         });
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -329,6 +366,15 @@
                 }
             });
         });
+
+        function toggleDetails(event) {
+            let element = event.currentTarget;
+            let details = element.querySelector(".hidden-details");
+
+            if (details) {
+                details.style.display = details.style.display === "none" ? "block" : "none";
+            }
+        }
     </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1FY8T9LQ3W"></script>

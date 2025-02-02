@@ -1,0 +1,109 @@
+# **Common Jazz Progressions**
+Jazz ii-V-I (C), Dm7, G7, Cmaj7
+Jazz ii-V-I (F), Gm7, C7, Fmaj7
+Jazz ii-V-I (G), Am7, D7, Gmaj7
+Jazz I-vi-ii-V (C Turnaround), Cmaj7, A7, Dm7, G7
+Jazz I-vi-ii-V (G Turnaround), Gmaj7, E7, Am7, D7
+Jazz Rhythm Changes (Bb), Bb, G7, Cm7, F7, D7, G7, C7, F7
+Jazz Rhythm Changes (C), C, A7, Dm7, G7, E7, A7, D7, G7
+ii-V-I (C), Dm7, G7, Cmaj7
+ii-V-I (G), Am7, D7, Gmaj7
+ii-V-I (F), Gm7, C7, Fmaj7
+ii-V-I (Bb), Cm7, F7, Bbmaj7
+Turnaround (C), Cmaj7, A7, Dm7, G7
+Turnaround (G), Gmaj7, E7, Am7, D7
+Rhythm Changes (Bb), Bb, G7, Cm7, F7, D7, G7, C7, F7
+So What (Modal Dorian - Dm7), Dm7, Em7, Dm7, G7
+Blue Bossa (Cm Latin Jazz), Cm7, Fm7, Bb7, Ebmaj7, Ab7, Dbmaj7, G7, Cm7
+Autumn Leaves (Cm), Cm7, F7, Bbmaj7, Ebmaj7, Am7b5, D7
+
+# **Common Pop/Rock Progressions**
+I-V-vi-IV (C) - Common Pop, C, G, Am, F
+I-V-vi-IV (G) - Common Pop, G, D, Em, C
+I-V-vi-IV (D) - Common Pop, D, A, Bm, G
+I-IV-V (Blues-Rock - C), C, F, G
+I-IV-V (Blues-Rock - G), G, C, D
+I-IV-V (Blues-Rock - A), A, D, E
+Axis Progression (C) - Ed Sheeran / The Beatles, C, G, Am, F
+Axis Progression (G) - Ed Sheeran / The Beatles, G, D, Em, C
+I-V-vi-iii-IV - 50s Ballad (C), C, G, Am, Em, F
+I-V-vi-iii-IV - 50s Ballad (G), G, D, Em, Bm, C
+Sweet Home Alabama (D Mixolydian), D, C, G, D
+With or Without You (U2 - C), C, G, Am, F
+Stand By Me (C), C, Am, F, G
+Let It Be (C), C, G, Am, F
+Don't Stop Believin' (E), E, B, C#m, A
+Stairway to Heaven (Am), Am, C, D, F, G, Am, C, D
+Hotel California (Bm), Bm, F#, A, E, G, D, Em, F#
+Pop I-V-vi-IV (C), C, G, Am, F
+Pop I-V-vi-IV (G), G, D, Em, C
+Pop I-V-vi-IV (F), F, C, Dm, Bb
+Rock I-V-vi-IV (C Axis Progression), C, G, Am, F
+Rock I-V-vi-IV (D Axis Progression), D, A, Bm, G
+Rock I-IV-V (12-Bar Blues in C), C7, F7, C7, G7, F7, C7
+Rock I-IV-V (12-Bar Blues in G), G7, C7, G7, D7, C7, G7
+
+Someone Like You (Adele - A), A, E, F#m, D
+Rolling in the Deep (Adele - C), C, G, Bb, F
+Shape of You (Ed Sheeran - Bm), Bm, Em, G, A
+Closer (The Chainsmokers - C), C, G, Am, F
+All of Me (John Legend - Fm), Fm, Db, Ab, Eb
+Chasing Cars (Snow Patrol - A), A, E, D
+Wonderwall (Oasis - F#m), F#m, A, E, B
+Boulevard of Broken Dreams (Green Day - Fm), Fm, Bb, Eb, Ab
+
+Hallelujah (Leonard Cohen - C), C, Am, C, Am, F, G, C
+Blowin’ in the Wind (Bob Dylan - G), G, C, D
+Fast Car (Tracy Chapman - C), C, G, Em, D
+Take Me Home Country Roads (G), G, D, Em, C
+
+# Experimental & Radiohead-Inspired Progressions
+Everything in Its Right Place (F#m), F#m, C#m, B, F#m
+Street Spirit (Am), Am, Em, C, G, D
+Karma Police (A), A, D, E, F#m, G, D
+No Surprises (F), F, Bbm, F, C, Dm, Bb
+Reckoner (C#m), C#m, B, E, Amaj7
+How to Disappear Completely (D Mixolydian), D, A, Bm, G, D
+Exit Music (Bm), Bm, E, G, F#, Bm
+Weird Fishes (B Mixolydian), B, F#, A, E, B
+Pyramid Song (F#m), F#m, A, Bm, F#m, D, A, E
+
+# Dark, Dreamy & Modal Alt-Rock Progressions
+Lover, You Should've Come Over (Jeff Buckley - E), E, C#m, A, B, G#m
+Grace (Jeff Buckley - C#), C#m, A, E, B, F#m
+Bloodbuzz Ohio (The National - D), D, G, Em, C
+Do I Wanna Know? (Arctic Monkeys - Cm), Cm, Gm, Ab, Fm
+Taro (Alt-J - Dm), Dm, C, Bb, F, Dm
+Untitled #1 (Sigur Rós - Bb Lydian), Bb, Eb, Bb, F
+
+# More variations, using extended chords
+I-vi-IV-V6, C, Am, F, G6
+I-V-vi-IV6, D, A, Bm, G6
+I6-IV-V-vi, E6, A, B, C#m
+I-IV-I-V6, G, C, G, D6
+I-IV-V-Isus2, A, D, E, Asus2
+I-V-vi-IVsus2, C, G, Am, Fsus2
+ii-V-I6, Dm, G, C6
+I-IVsus4-V-IV, E, Asus4, B, A
+I-Vsus2-vi-IV, D, Asus2, Bm, G
+IV-I-V6-vi, F, C, G6, Am
+I-V-vi-ii-IV6, G, D, Em, Am, C6
+I-IVsus4-V6-I, A, Dsus4, E6, A
+Iadd9-IV-vi-V, Cadd9, F, Am, G
+I-V-vi-IVsus4, E, B, C#m, Asus4
+Isus2-IV-Vsus4-I, Gsus2, C, Dsus4, G
+IV-I-V6-vi, F, C, G6, Am
+I-IVsus4-V-vi, D, Gsus4, A, Bm
+I6-ii-Vsus2-I, A6, Bm, Esus2, A
+I-IV-Vsus4-vi, G, C, Dsus4, Em
+I-Vsus2-vi-IV, C, Gsus2, Am, F
+Isus4-Vsus2-IV-I, E, Bsus2, A, E
+ii-V-I6-IV, Dm, G, C6, F
+I-IV-Vsus4-IV6, C, F, Gsus4, F6
+I-V-IV-vi-I6, E, B, A, C#m, E6
+I-IVsus2-Vsus4-I6, D, Gsus2, Asus4, D6
+Iadd9-Vsus2-vi-IV, Gadd9, Dsus2, Em, C
+I-IV-I6-Vsus4, C, F, C6, Gsus4
+I6-IV-V-vi, A6, D, E, F#m
+I-V6-IV-vi, C, G6, F, Am
+I-IV-Vsus4-vi, E, A, Bsus4, C#m
