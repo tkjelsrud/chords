@@ -58,7 +58,7 @@
         }
 
         #chordEditor {
-            min-height: 150px;
+            min-height: 250px;
             border: 1px solid #ccc;
             padding: 10px;
             font-size: 18px;
@@ -220,10 +220,17 @@
                 // Clear all previous floating results
                 resultsContainer.innerHTML = "";
 
+                let detailsDiv = document.getElementById("details"); // Always show details
+                if (!detailsDiv) return;
+
+                let hasValidChords = false; // Track if we have any valid input chords
+
                 lines.forEach((line, index) => {
                     let chords = getChordMatches(line.split(/\s+/));
-                    //console.log(chords);
+
                     if (chords.scales.length > 0) {
+                        hasValidChords = true; // Mark that we have valid chords
+
                         let resultBox = document.createElement("div");
                         resultBox.classList.add("chord-results");
                         resultBox.innerHTML = chords.scales.slice(0, 1)
@@ -242,55 +249,71 @@
                             .filter(text => text !== "")
                             .join(" ");
 
-                        resultBox.style.top = `${-144 + (index * 54)}px`;
+                        resultBox.style.top = `${-244 + (index * 54)}px`;
                         //
                         resultBox.onclick = function() {
-                            let detailsDiv = document.getElementById("details");
-                            if (!detailsDiv) return; // Ensure the div exists
-
-                            let seenProgressions = new Set(); // Track unique progressions
-
-                            let fullDetails = chords.scales.slice(0, 5) // Limit to top 5 results
-                                .map((match) => {
-                                    // 🔹 Ensure full-scale chords are properly extracted
-                                    let keyChordsWithPlacement = match.fullScaleChords
-                                        .map(p => `<strong>${p.chord}</strong> (${p.placement || "?"})`) // 🔥 Extract **chord name** instead of object
-                                        .join(" - ");
-
-                                    let suggestionText = match.suggestions.length > 0 ? 
-                                        `<br><span class="suggestion">Suggestions: ${match.suggestions.join(", ")}</span>` : "";
-
-                                    let progressionText = "";
-                                    if (chords.progressions.length > 0) {
-                                        let uniqueProgressions = chords.progressions
-                                            .filter(p => !seenProgressions.has(p.name)) // Avoid duplicates
-                                            .map(p => {
-                                                seenProgressions.add(p.name);
-                                                return `<strong>${p.name}</strong>: ${p.fullProgressionChords
-                                                    .map(p => `${p.chord} (${p.placement})`) // 🔥 Extract chords in progressions properly
-                                                    .join(" - ")}`;
-                                            });
-
-                                        if (uniqueProgressions.length > 0) {
-                                            progressionText = `<br><div class="detailhead">Similar progressions</div><span class="progressions">${uniqueProgressions.join("<br/>")}</span>`;
-                                        }
-                                    }
-
-                                    return `<div class="detail-item">
-                                                <div class="detailhead">${match.key} <span class="score">Score: ${match.score}</span></div>
-                                                <div><strong>Chords in key:</strong> ${keyChordsWithPlacement}</div> <!-- 🎵 Now all chords + correct numerals -->
-                                                ${suggestionText}
-                                                ${progressionText}
-                                            </div>`;
-                                }).join("");
-
-                            detailsDiv.innerHTML = fullDetails;
+                            updateDetailsBox(chords); // 🔥 Calls function to update details
                         };
-                         
+
                         resultsContainer.appendChild(resultBox);
                     }
                 });
+
+                // 🔹 If there are valid chords, update the details box dynamically
+                if (hasValidChords) {
+                    let allChords = getChordMatches(lines.flatMap(line => line.split(/\s+/)));
+                    updateDetailsBox(allChords);
+                } else {
+                    detailsDiv.innerHTML = ""; // Hide details if no chords are found
+                }
             }
+
+            // 🔹 Extracted function to update details without requiring a click
+            function updateDetailsBox(chords) {
+                let detailsDiv = document.getElementById("details");
+                if (!detailsDiv) return;
+
+                let seenProgressions = new Set();
+
+                let fullDetails = chords.scales.slice(0, 8)
+                    .map((match) => {
+                        let keyChordsWithPlacement = match.fullScaleChords
+                            .map(p => `<strong>${p.chord}</strong> (${p.placement || "?"})`)
+                            .join(" - ");
+
+                        let suggestionText = match.suggestions.length > 0 ? 
+                            `<br><span class="suggestion">Suggestions: ${match.suggestions.join(", ")}</span>` : "";
+
+                        let progressionText = "";
+                        if (chords.progressions.length > 0) {
+                            let uniqueProgressions = chords.progressions
+                                .filter(p => !seenProgressions.has(p.name))
+                                .map(p => {
+                                    seenProgressions.add(p.name);
+                                    return `<strong>${p.name}</strong>: ${p.fullProgressionChords
+                                        .map(p => `${p.chord} (${p.placement})`)
+                                        .join(" - ")}`;
+                                });
+
+                            if (uniqueProgressions.length > 0) {
+                                progressionText = `<br><div class="detailhead">Similar progressions</div><span class="progressions">${uniqueProgressions.join("<br/>")}</span>`;
+                            }
+                        }
+
+                        return `<div class="detail-item">
+                                    <div class="detailhead">${match.key} <span class="score">Score: ${match.score}</span></div>
+                                    <div><strong>Chords in key:</strong> ${keyChordsWithPlacement}</div>
+                                    ${suggestionText}
+                                    ${progressionText}
+                                </div>`;
+                    }).join("");
+
+                detailsDiv.innerHTML = fullDetails;
+            }
+
+            // 🔹 Ensure updates happen while typing
+            document.getElementById("chordEditor").addEventListener("input", updateFloatingResults);
+            
         });
 
         document.addEventListener("DOMContentLoaded", () => {
