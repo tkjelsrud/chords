@@ -126,14 +126,98 @@ export class UIManager {
     }
 
     /**
-     * Handle paste events
+     * Handle paste events - convert to plain text
      */
     handleEditorPaste(event) {
-        // Allow default paste behavior, then format
-        setTimeout(() => {
-            this.formatChords();
-            this.analyzeCurrentContent();
-        }, 10);
+        event.preventDefault();
+        
+        // Get clipboard data
+        const clipboardData = event.clipboardData || window.clipboardData;
+        let pastedText = '';
+        
+        if (clipboardData) {
+            // Try to get plain text first
+            pastedText = clipboardData.getData('text/plain');
+            
+            // If no plain text, try to extract text from HTML
+            if (!pastedText) {
+                const htmlData = clipboardData.getData('text/html');
+                if (htmlData) {
+                    // Create temporary element to extract text content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = htmlData;
+                    pastedText = tempDiv.textContent || tempDiv.innerText || '';
+                }
+            }
+        }
+        
+        // Process the text to merge single newlines but preserve intentional breaks
+        if (pastedText) {
+            const processedText = this.processTablePastedText(pastedText);
+            this.insertTextAtCursor(processedText);
+            
+            // Format and analyze after insertion
+            setTimeout(() => {
+                this.formatChords();
+                this.analyzeCurrentContent();
+            }, 10);
+        }
+    }
+
+    /**
+     * Insert plain text at the current cursor position
+     */
+    insertTextAtCursor(text) {
+        const selection = window.getSelection();
+        
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            range.deleteContents();
+            
+            // Create text node and insert
+            const textNode = document.createTextNode(text);
+            range.insertNode(textNode);
+            
+            // Move cursor to end of inserted text
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } else {
+            // If no selection, append to the end of the editor
+            this.editor.appendChild(document.createTextNode(text));
+        }
+    }
+
+    /**
+     * Process pasted text to intelligently merge newlines for chord progression
+     * Converts single newlines to spaces, preserves double newlines as breaks
+     */
+    processTablePastedText(text) {
+        if (!text) return text;
+        
+        // First, normalize different types of line breaks
+        let processed = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        
+        // Replace sequences of tabs and multiple spaces with single spaces
+        processed = processed.replace(/[\t ]+/g, ' ');
+        
+        // Mark double+ newlines with a temporary placeholder to preserve them
+        processed = processed.replace(/\n\n+/g, '###DOUBLE_NEWLINE###');
+        
+        // Convert all remaining single newlines to spaces
+        processed = processed.replace(/\n/g, ' ');
+        
+        // Restore the double newlines as single newlines (paragraph breaks)
+        processed = processed.replace(/###DOUBLE_NEWLINE###/g, '\n');
+        
+        // Clean up any resulting multiple spaces
+        processed = processed.replace(/ +/g, ' ');
+        
+        // Trim whitespace from start and end
+        processed = processed.trim();
+        
+        return processed;
     }
 
     /**
