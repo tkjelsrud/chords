@@ -1,0 +1,531 @@
+/**
+ * Modern CSS Architecture for Chord Analysis Tool
+ * Using CSS Custom Properties (variables) and organized structure
+ */
+
+/* ===== CSS Custom Properties (Variables) ===== */
+:root {
+    /* Color Palette */
+    --color-primary: #2a9d8f;
+    --color-primary-light: rgba(42, 157, 143, 0.1);
+    --color-primary-dark: #238276;
+    --color-secondary: #c2376f;
+    --color-accent: #244d83;
+    
+    /* Neutral Colors */
+    --color-bg-main: #ffffff;
+    --color-bg-secondary: #f4f4f4;
+    --color-bg-tertiary: #antiquewhite;
+    --color-border: #ccc;
+    --color-border-light: #ddd;
+    --color-text-primary: #000;
+    --color-text-secondary: #888;
+    --color-text-muted: #CCC;
+    
+    /* Typography */
+    --font-family-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --font-size-sm: 12px;
+    --font-size-xs: 11px;
+    --line-height-base: 1.5;
+    --line-height-relaxed: 3;
+    
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 6px;
+    --spacing-md: 10px;
+    --spacing-lg: 12px;
+    --spacing-xl: 20px;
+    --spacing-xxl: 24px;
+    
+    /* Layout */
+    --border-radius: 4px;
+    --border-radius-sm: 2px;
+    --max-width-editor: 600px;
+    --min-height-editor: 250px;
+    --z-index-floating: 100;
+    --z-index-modal: 1000;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+}
+
+/* ===== Base Styles ===== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family-main);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-main);
+    margin: 0;
+    padding: var(--spacing-md);
+}
+
+/* ===== Header Styles ===== */
+header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+header h1 {
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+header p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-size: var(--font-size-base);
+}
+
+/* ===== Chord Highlighting ===== */
+.chord {
+    font-weight: bold;
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.chord:hover {
+    background: var(--color-primary);
+    color: white;
+}
+
+.accidental {
+    display: inline-block;
+    width: auto;
+}
+
+/* ===== Layout Components ===== */
+
+/* Main sections */
+.tab-section {
+    margin-bottom: var(--spacing-md);
+}
+
+.editor-section {
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+}
+
+.results-section {
+    margin-top: var(--spacing-xl);
+}
+
+/* Editor container */
+#editor-container {
+    position: relative;
+    width: 100%;
+    max-width: var(--max-width-editor);
+    margin: 0 auto;
+}
+
+/* Main chord editor */
+#chordEditor {
+    min-height: var(--min-height-editor);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    font-family: var(--font-family-main);
+    outline: none;
+    white-space: pre-wrap;
+    cursor: text;
+    width: 100%;
+    line-height: var(--line-height-relaxed);
+    background: var(--color-bg-main);
+    transition: border-color var(--transition-medium), box-shadow var(--transition-medium);
+    resize: vertical;
+}
+
+#chordEditor:focus,
+#chordEditor.focused {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+#chordEditor:empty::before {
+    content: "Type chords here: C Am F G";
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+/* Instructions */
+.instructions {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-sm);
+    font-style: italic;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Floating results container */
+#floatingResultsContainer {
+    position: absolute;
+    width: 100%;
+    pointer-events: none; /* Prevent interaction interference */
+}
+
+/* Floating chord analysis results */
+.chord-results {
+    position: absolute;
+    background: rgba(170, 170, 170, 0.95);
+    color: var(--color-accent);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-xs);
+    max-width: 75%;
+    opacity: 0.9;
+    border-bottom: 2px solid rgba(149, 149, 149, 0.9);
+    z-index: var(--z-index-floating);
+    transform: translateY(-100%);
+    white-space: normal;
+    text-align: left;
+    pointer-events: auto; /* Allow clicking on results */
+    cursor: pointer;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+    backdrop-filter: blur(2px);
+}
+
+.chord-results:hover {
+    opacity: 1;
+    transform: translateY(-100%) scale(1.02);
+}
+
+/* Suggestions within results */
+.suggestion {
+    color: var(--color-secondary);
+    font-weight: 500;
+}
+
+/* Score indicators */
+.score {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: normal;
+}
+
+/* ===== Tab System ===== */
+#tabs-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    background: var(--color-bg-secondary);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-fast);
+    position: relative;
+    min-width: 0; /* Allow text truncation */
+}
+
+.tab:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+.tab.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary-dark);
+}
+
+.tab-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tab-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+.tab-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.tab.active .tab-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+#addTab {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: var(--font-size-base);
+    border: 1px solid var(--color-border-light);
+    background: var(--color-bg-secondary);
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-fast);
+    min-width: 40px;
+}
+
+#addTab:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+/* ===== Details and Results Section ===== */
+#details {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-md);
+    width: 100%;
+    max-width: var(--max-width-editor);
+    margin: 0 auto;
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border-light);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detailhead {
+    margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(170, 170, 170, 0.9);
+    border-radius: var(--border-radius-sm);
+    border-bottom: 2px solid rgba(149, 149, 149, 0.9);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.detailhead:first-child {
+    margin-top: 0;
+}
+
+.detail-item {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-sm);
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: var(--border-radius-sm);
+    border-left: 3px solid var(--color-primary);
+}
+
+.progressions {
+    line-height: 1.6;
+}
+
+.progression-item {
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-xs);
+}
+
+/* Expandable results (if needed for future features) */
+.expandable-result {
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-border-light);
+    transition: background-color var(--transition-fast);
+}
+
+.expandable-result:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.hidden-details {
+    font-size: var(--font-size-sm);
+    padding-top: var(--spacing-xs);
+    border-top: 1px solid var(--color-border-light);
+    margin-top: var(--spacing-xs);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+    :root {
+        --font-size-base: 14px;
+        --font-size-lg: 16px;
+        --spacing-md: 8px;
+        --spacing-lg: 10px;
+        --max-width-editor: 100%;
+    }
+    
+    body {
+        padding: var(--spacing-sm);
+    }
+    
+    #tabs-container {
+        gap: var(--spacing-xs);
+    }
+    
+    .tab {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-xs);
+    }
+    
+    .tab-name {
+        max-width: 80px;
+    }
+    
+    #chordEditor {
+        font-size: var(--font-size-base);
+        padding: var(--spacing-sm);
+    }
+    
+    .chord-results {
+        font-size: 10px;
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    #chordEditor {
+        min-height: 200px;
+    }
+    
+    .chord-results {
+        position: relative;
+        transform: none;
+        margin: var(--spacing-xs) 0;
+        opacity: 1;
+    }
+}
+
+/* ===== Error States ===== */
+.error-message {
+    background: #ff6b6b;
+    color: white;
+    padding: var(--spacing-lg) var(--spacing-xxl);
+    border-radius: var(--border-radius);
+    margin: var(--spacing-md) 0;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+/* ===== Loading States ===== */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--color-primary-light);
+    border-top: 2px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes slideInRight {
+    0% { 
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% { 
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    0% { 
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes slideInDown {
+    0% { 
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+    100% { 
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutUp {
+    0% { 
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+    100% { 
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+}
+
+/* ===== Temporary Messages ===== */
+.temporary-message {
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+/* ===== Focus and Accessibility ===== */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

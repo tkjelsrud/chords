@@ -4,430 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chord Editor</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .chord {
-            font-weight: bold;
-            color: #2a9d8f;
-            background: rgba(42, 157, 143, 0.1);
-            padding: 2px 4px;
-            border-radius: 4px;
-        }
-        .accidental {
-            display: inline-block;
-            width: auto;
-        }
-        .chord-results {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            max-width: 220px;
-            max-height: 40px; /* Ensure minimal space usage */
-            overflow: hidden;
-            text-align: center;
-            white-space: nowrap;
-            line-height: 1.2;
-            z-index: 10;
-            transform: translateY(-120%); /* Move results *above* the line */
-            opacity: 0.9;
-        }
-        .line {
-            position: relative; /* Needed for absolute positioning */
-            padding-top: 15px; /* Space for floating results */
-        }
-
-        #resultsSidebar {
-            flex: 1;
-            background: #f4f4f4;
-            padding: 10px;
-            border-left: 2px solid #ddd;
-            overflow-y: auto;
-            max-height: 300px;
-        }
-
-        #editor-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        #chordEditor {
-            min-height: 250px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            font-size: 18px;
-            outline: none;
-            white-space: pre-wrap;
-            cursor: text;
-            width: 90%;
-            line-height: 3; /* Adds spacing to prevent overlapping */
-        }
-
-        #floatingResultsContainer {
-            position: absolute;
-            width: 100%; /* Ensures it spans across the editor */
-            /*pointer-events: none;*/ /* Prevents accidental interactions */
-        }
-
-        .chord-results {
-            position: absolute;
-            background: rgba(170, 170, 170, 0.9);
-            color: rgb(36, 77, 131);
-            padding: 4px 6px;
-            border-radius: 2px;
-            font-size: 11px;
-            max-width: 75%; /* Expands wider but doesn’t take full width */
-            min-width: 50%; /* Ensures decent readability */
-            opacity: 0.7;
-            border-bottom: 2px solid rgba(149, 149, 149, 0.9);
-;
-            z-index: 100;
-            transform: translateY(-100%); /* Floats above the text */
-            white-space: normal; /* Allows wrapping instead of forcing single line */
-            text-align: left; /* Aligns text naturally */
-        }
-
-        .suggestion {
-            color: #c2376f;
-        }
-
-        #tabs-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .tab {
-            padding: 6px 12px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            background: #f4f4f4;
-            border-radius: 4px;
-        }
-
-        .tab.active {
-            background: #2a9d8f;
-            color: white;
-        }
-
-        #addTab {
-            padding: 6px 12px;
-            font-size: 16px;
-            border: none;
-            background: #ddd;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .expandable-result {
-            cursor: pointer;
-            padding: 4px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .expandable-result:hover {
-            background-color: #f4f4f4;
-        }
-
-        .hidden-details {
-            font-size: 12px;
-            padding-top: 4px;
-        }
-        #details {
-            font-size: 12px;
-            padding-top: 20px;
-            width: 90%;
-            background-color: antiquewhite;
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-        .detailhead {
-            margin-top: 8px;
-            background: rgba(170, 170, 170, 0.9);
-            border-bottom: 2px solid rgba(149, 149, 149, 0.9);
-        }
-        .score {
-            color: #CCC;
-            font-size: 11px;
-        }
-    </style>
+    <link rel="stylesheet" href="lib/default.css">
 </head>
 <body>
+    <header>
+        <h1>Chord Analysis Tool</h1>
+        <p>Analyze chord progressions and discover musical possibilities</p>
+    </header>
 
-    <h2>Chords analyzer</h2>
-    <div id="tabs-container">
-        <button id="addTab">+</button> <!-- Button to create a new tab -->
-    </div>
-    <div id="editor-container">
-        <div id="chordEditor" contenteditable="true" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></div>
-    </div>
-    <div id="floatingResultsContainer"></div> <!-- Holds multiple floating result boxes -->
+    <main>
+        <section class="tab-section">
+            <div id="tabs-container" role="tablist" aria-label="Chord progression tabs">
+                <button id="addTab" type="button" aria-label="Add new tab">+</button>
+            </div>
+        </section>
 
-    <div id="details"></div>
-    <script src="lib/lib.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {   
-            const editor = document.getElementById("chordEditor");
-            const resultsContainer = document.getElementById("floatingResultsContainer");
+        <section class="editor-section">
+            <div id="editor-container">
+                <label for="chordEditor" class="sr-only">Enter your chord progression</label>
+                <div 
+                    id="chordEditor" 
+                    contenteditable="true" 
+                    spellcheck="false" 
+                    autocomplete="off" 
+                    autocorrect="off" 
+                    autocapitalize="off"
+                    role="textbox"
+                    aria-label="Chord progression input"
+                    aria-describedby="instructions"
+                ></div>
+                <div id="instructions" class="instructions">
+                    Type chords like: C Am F G or Cmaj7 Dm7 G7 Cmaj7
+                </div>
+            </div>
+            <div id="floatingResultsContainer" aria-live="polite"></div>
+        </section>
 
-            // Automatically format chords as the user types
-            const observer = new MutationObserver(() => {
-                formatChords();
-            });
+        <section class="results-section">
+            <div id="details" aria-live="polite" aria-label="Chord analysis results"></div>
+        </section>
+    </main>
 
-            observer.observe(editor, { childList: true, subtree: true, characterData: true });
-
-            editor.addEventListener("input", () => {
-                formatChords(); // Format only newly typed chords
-            });
-
-            function formatChords() {
-                let selection = window.getSelection();
-                let range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-
-                let textNodes = [...editor.childNodes].filter(node => node.nodeType === 3);
-                textNodes.forEach(node => {
-                    let formatted = node.textContent.replace(/\b([A-G](?:#|b|♯|♭)?(?:maj7|m7|m|7|dim|sus[24]?)?)\b/g, match => {
-                        return `<span class="chord">${match}</span>`;
-                    });
-
-                    if (node.textContent !== formatted) {
-                        let temp = document.createElement("span");
-                        temp.innerHTML = formatted;
-                        node.replaceWith(...temp.childNodes);
-                    }
-                });
-
-                if (range) {
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                }
-
-                //updateSidebarResults(editor.innerText.trim()); // Keep sidebar results updated
-                updateFloatingResults();
-            }
-
-            function updateFloatingResults() {
-                let lines = editor.innerText.split("\n").filter(line => line.trim() !== "");
-                
-                // Clear all previous floating results
-                resultsContainer.innerHTML = "";
-
-                let detailsDiv = document.getElementById("details"); // Always show details
-                if (!detailsDiv) return;
-
-                let hasValidChords = false; // Track if we have any valid input chords
-
-                lines.forEach((line, index) => {
-                    let chords = getChordMatches(line.split(/\s+/));
-
-                    if (chords.scales.length > 0) {
-                        hasValidChords = true; // Mark that we have valid chords
-
-                        let resultBox = document.createElement("div");
-                        resultBox.classList.add("chord-results");
-                        resultBox.innerHTML = chords.scales.slice(0, 1)
-                            .map((match, index) => {
-                                let colorStyle = index === 1 ? 'color: #888;' : 'color: #000;';
-                                let placements = match.chordPlacements
-                                    .filter(p => p.placement !== "") // Only show matched placements
-                                    .map(p => `${p.chord} (${p.placement})`) // Format chord + placement
-                                    .join(", ");
-
-                                let suggestionText = index === 0 && match.suggestions.length > 0 ? 
-                                    ` | <span class="suggestion">Try: ${match.suggestions.join(", ")}</span>` : "";
-
-                                return placements ? `<span style="${colorStyle}"><strong>${match.key}</strong>: ${placements}</span>${suggestionText}<span class="score"> [${match.score}]</span>` : ""; // Display only if placements exist
-                            })
-                            .filter(text => text !== "")
-                            .join(" ");
-
-                        resultBox.style.top = `${-244 + (index * 54)}px`;
-                        //
-                        resultBox.onclick = function() {
-                            updateDetailsBox(chords); // 🔥 Calls function to update details
-                        };
-
-                        resultsContainer.appendChild(resultBox);
-                    }
-                });
-
-                // 🔹 If there are valid chords, update the details box dynamically
-                if (hasValidChords) {
-                    let allChords = getChordMatches(lines.flatMap(line => line.split(/\s+/)));
-                    updateDetailsBox(allChords);
-                } else {
-                    detailsDiv.innerHTML = ""; // Hide details if no chords are found
-                }
-            }
-
-            // 🔹 Extracted function to update details without requiring a click
-            function updateDetailsBox(chords) {
-                let detailsDiv = document.getElementById("details");
-                if (!detailsDiv) return;
-
-                let seenProgressions = new Set();
-
-                let fullDetails = chords.scales.slice(0, 8)
-                    .map((match) => {
-                        let keyChordsWithPlacement = match.fullScaleChords
-                            .map(p => `<strong>${p.chord}</strong> (${p.placement || "?"})`)
-                            .join(" - ");
-
-                        let suggestionText = match.suggestions.length > 0 ? 
-                            `<br><span class="suggestion">Suggestions: ${match.suggestions.join(", ")}</span>` : "";
-
-                        return `<div class="detail-item">
-                                    <div class="detailhead">${match.key} <span class="score">Score: ${match.score}</span></div>
-                                    <div><strong>Chords in key:</strong> ${keyChordsWithPlacement}</div>
-                                    ${suggestionText}
-                                </div>`;
-                    }).join("");
-
-                // 🔹 **Ensure progressions are only displayed ONCE**
-                let progressionText = "";
-                if (chords.progressions.length > 0) { // ✅ Only runs ONCE per search
-                    let seenProgressions = new Set();
-
-                    let uniqueProgressions = chords.progressions
-                        .filter(p => !seenProgressions.has(p.name)) // ✅ Prevent duplicates
-                        .map(p => {
-                            seenProgressions.add(p.name); // ✅ Track displayed progressions
-                            let progressionChords = p.chords || [];
-
-                            let formattedChords = progressionChords
-                                .map((chord, idx) => `<strong>${chord}</strong> (${romanNumerals[idx] || "?"})`)
-                                .join(" - ");
-
-                            return `<strong>${p.name}</strong>: ${formattedChords}`;
-                        });
-
-                    if (uniqueProgressions.length > 0) {
-                        progressionText = `<br><div class="detailhead">Similar progressions</div>
-                                        <span class="progressions">${uniqueProgressions.join("<br/>")}</span>`;
-                    }
-                }
-
-                // 🔹 Append the progression text ONCE at the bottom
-                fullDetails = progressionText + fullDetails;
-
-                // 🔹 Update details box
-                detailsDiv.innerHTML = fullDetails;
-            }
-
-            // 🔹 Ensure updates happen while typing
-            document.getElementById("chordEditor").addEventListener("input", updateFloatingResults);
-            
-        });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const editor = document.getElementById("chordEditor");
-            const tabsContainer = document.getElementById("tabs-container");
-            const addTabButton = document.getElementById("addTab");
-
-            let tabs = JSON.parse(localStorage.getItem("chordTabs")) || [{ name: "Untitled", content: "" }];
-            let activeTabIndex = 0;
-
-            function saveTabsToStorage() {
-                localStorage.setItem("chordTabs", JSON.stringify(tabs));
-            }
-
-            function loadTab(index) {
-                activeTabIndex = index;
-                editor.innerText = tabs[index].content;
-                updateTabUI();
-            }
-
-            function updateTabUI() {
-                tabsContainer.innerHTML = "";
-                tabs.forEach((tab, index) => {
-                    let tabElement = document.createElement("div");
-                    tabElement.classList.add("tab");
-                    if (index === activeTabIndex) tabElement.classList.add("active");
-                    tabElement.textContent = tab.name;
-                    tabElement.addEventListener("click", () => loadTab(index));
-
-                    // 🔹 Double-click to rename tab
-                    tabElement.addEventListener("dblclick", () => {
-                        let newName = prompt("Rename Tab:", tab.name);
-                        if (newName && newName.trim() !== "") {
-                            tabs[index].name = newName.trim();
-                            saveTabsToStorage();
-                            updateTabUI();
-                        }
-                    });
-
-                    tabsContainer.appendChild(tabElement);
-                });
-
-                // 🔹 Re-add the "+" button
-                tabsContainer.appendChild(addTabButton);
-            }
-
-            function createNewTab() {
-                tabs.push({ name: `Tab ${tabs.length + 1}`, content: "" });
-                saveTabsToStorage();
-                loadTab(tabs.length - 1);
-            }
-
-            // 🔹 Save editor content to the active tab
-            editor.addEventListener("input", () => {
-                tabs[activeTabIndex].content = editor.innerText;
-                saveTabsToStorage();
-            });
-
-            addTabButton.addEventListener("click", createNewTab);
-
-            // Load initial tab
-            updateTabUI();
-            loadTab(0);
-        });
-
-        let lastSentText = ""; // To prevent sending the same input repeatedly
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const editor = document.getElementById("chordEditor");
-
-            editor.addEventListener("input", () => {
-                const inputText = editor.innerText.trim();
-
-                if (inputText.length > 0 && inputText !== lastSentText) {
-                    lastSentText = inputText; // Prevent duplicate sends
-
-                    gtag('event', 'chord_input', {
-                        'event_category': 'User Input',
-                        'event_label': inputText,
-                        'value': inputText.length
-                    });
-
-                    //console.log("Sent to GA:", inputText);
-                }
-            });
-        });
-
-        function toggleDetails(event) {
-            let element = event.currentTarget;
-            let details = element.querySelector(".hidden-details");
-
-            if (details) {
-                details.style.display = details.style.display === "none" ? "block" : "none";
-            }
-        }
-    </script>
-    <!-- Google tag (gtag.js) -->
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+    
+    <!-- Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1FY8T9LQ3W"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', 'G-1FY8T9LQ3W');
     </script>
 </body>
