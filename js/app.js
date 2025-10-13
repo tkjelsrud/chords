@@ -8,6 +8,8 @@ import { TabManager } from './modules/TabManager.js';
 import { UIManager } from './modules/UIManager.js';
 import { DataLoader } from './modules/DataLoader.js';
 import { Analytics } from './modules/Analytics.js';
+import { AudioSynth } from './modules/AudioSynth.js';
+import { ChordPlayer } from './modules/ChordPlayer.js';
 
 class ChordApp {
     constructor() {
@@ -16,6 +18,8 @@ class ChordApp {
         this.tabManager = null;
         this.uiManager = null;
         this.analytics = new Analytics();
+        this.audioSynth = new AudioSynth();
+        this.chordPlayer = null;
         
         this.init();
     }
@@ -30,7 +34,12 @@ class ChordApp {
             // Initialize core modules with error handling
             this.chordAnalyzer = new ChordAnalyzer(this.dataLoader.getData());
             this.tabManager = new TabManager();
-            this.uiManager = new UIManager(this.chordAnalyzer, this.tabManager, this.analytics);
+            
+            // Initialize audio modules
+            this.chordPlayer = new ChordPlayer(this.audioSynth);
+            
+            // Initialize UI with all dependencies
+            this.uiManager = new UIManager(this.chordAnalyzer, this.tabManager, this.analytics, this.audioSynth, this.chordPlayer);
             
             // Set up cross-module communication
             this.setupEventListeners();
@@ -235,7 +244,7 @@ class ChordApp {
 
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new ChordApp();
+    window.app = new ChordApp();
 });
 
 // Export for potential external use

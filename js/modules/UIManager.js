@@ -4,10 +4,12 @@
  */
 
 export class UIManager {
-    constructor(chordAnalyzer, tabManager, analytics) {
+    constructor(chordAnalyzer, tabManager, analytics, audioSynth, chordPlayer) {
         this.chordAnalyzer = chordAnalyzer;
         this.tabManager = tabManager;
         this.analytics = analytics;
+        this.audioSynth = audioSynth;
+        this.chordPlayer = chordPlayer;
         this.eventListeners = new Map();
         
         // DOM elements
@@ -16,6 +18,7 @@ export class UIManager {
         this.resultsContainer = null;
         this.detailsContainer = null;
         this.addTabButton = null;
+        this.audioToggle = null;
         
         // State
         this.lastAnalyzedText = '';
@@ -55,6 +58,7 @@ export class UIManager {
         this.resultsContainer = document.getElementById('floatingResultsContainer');
         this.detailsContainer = document.getElementById('details');
         this.addTabButton = document.getElementById('addTab');
+        this.audioToggle = document.getElementById('audioToggle');
         
         if (!this.editor || !this.tabsContainer) {
             throw new Error('Required DOM elements not found');
@@ -73,6 +77,11 @@ export class UIManager {
         
         // Tab management events
         this.addTabButton.addEventListener('click', this.handleAddTab.bind(this));
+        
+        // Audio toggle event
+        if (this.audioToggle) {
+            this.audioToggle.addEventListener('click', this.handleAudioToggle.bind(this));
+        }
         
         // Tab manager events
         this.tabManager.on('tabChanged', this.handleTabChanged.bind(this));
@@ -564,6 +573,9 @@ Keyboard Shortcuts:
             this.updateFloatingResults(lines);
             this.updateDetailsResults(results);
             
+            // Update chord click handlers for audio preview
+            this.updateChordClickHandlers();
+            
             // Show any user-facing errors
             if (results.errors && results.errors.some(error => error.includes('No valid chords'))) {
                 this.showTemporaryMessage('No valid chords detected. Try: C Am F G', 'info');
@@ -645,8 +657,8 @@ Keyboard Shortcuts:
                 <span class="score">[${topMatch.score.toFixed(1)}]</span>
             `;
             
-            // Position relative to line
-            resultBox.style.top = `${-40 + (index * 60)}px`;
+            // Calculate precise position relative to text line
+            this.positionResultBox(resultBox, index);
             
             // Add click handler for detailed view
             resultBox.addEventListener('click', () => {
@@ -1080,14 +1092,33 @@ Keyboard Shortcuts:
     }
 
     /**
+     * Position a result box relative to its corresponding text line
+     */
+    positionResultBox(resultBox, lineIndex) {
+        // Get editor computed styles
+        const editorStyles = getComputedStyle(this.editor);
+        const lineHeight = parseInt(editorStyles.lineHeight);
+        const paddingTop = parseInt(editorStyles.paddingTop);
+        
+        // Calculate position: padding + (line index * line height) + small offset for alignment
+        const topPosition = paddingTop + (lineIndex * lineHeight) + 5;
+        
+        // Position within the floating results container (which is to the left of editor)
+        resultBox.style.position = 'absolute';
+        resultBox.style.top = `${topPosition}px`;
+        resultBox.style.right = '10px'; // Position from the right edge of the container
+        resultBox.style.left = 'auto';
+        resultBox.style.transform = 'none';
+    }
+
+    /**
      * Update floating results layout (for responsive design)
      */
     updateFloatingResultsLayout() {
         const results = this.resultsContainer.querySelectorAll('.chord-results');
         results.forEach((result, index) => {
-            // Recalculate positions based on current viewport
-            const lineHeight = parseInt(getComputedStyle(this.editor).lineHeight);
-            result.style.top = `${-40 + (index * (lineHeight + 10))}px`;
+            // Recalculate positions using the new positioning method
+            this.positionResultBox(result, index);
         });
     }
 
@@ -1142,5 +1173,165 @@ Keyboard Shortcuts:
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    /**
+     * Handle audio preview toggle
+     */
+    async handleAudioToggle() {
+        if (!this.audioSynth || !this.audioToggle) return;
+
+        const isCurrentlyEnabled = this.audioSynth.isReady();
+        
+        try {
+            if (isCurrentlyEnabled) {
+                // Disable audio
+                this.audioSynth.disable();
+                this.updateAudioToggleUI(false);
+                // Remove click handlers from existing chords
+                this.updateChordClickHandlers();
+            } else {
+                // Enable audio (requires user gesture)
+                const success = await this.audioSynth.enable();
+                if (success) {
+                    this.updateAudioToggleUI(true);
+                    // Add click handlers to existing chords
+                    this.updateChordClickHandlers();
+                } else {
+                    console.error('Failed to enable audio');
+                    this.showError('Audio could not be enabled. Please check your browser settings.');
+                }
+            }
+        } catch (error) {
+            console.error('Audio toggle error:', error);
+            this.showError('Audio feature is not available in this browser.');
+        }
+    }
+
+    /**
+     * Update the audio toggle button UI
+     */
+    updateAudioToggleUI(enabled) {
+        if (!this.audioToggle) return;
+        
+        if (enabled) {
+            this.audioToggle.classList.add('audio-enabled');
+            this.audioToggle.classList.remove('audio-disabled');
+            this.audioToggle.title = 'Disable chord preview (click chords to hear them)';
+            this.audioToggle.setAttribute('aria-label', 'Audio preview enabled');
+        } else {
+            this.audioToggle.classList.remove('audio-enabled');
+            this.audioToggle.classList.add('audio-disabled');
+            this.audioToggle.title = 'Enable chord preview';
+            this.audioToggle.setAttribute('aria-label', 'Audio preview disabled');
+        }
+    }
+
+    /**
+     * Handle chord click for audio preview
+     */
+    handleChordClick(event, chordName) {
+        // Prevent default behavior if audio is not enabled
+        if (!this.audioSynth?.isReady()) {
+            return;
+        }
+
+        // Stop event propagation to prevent other handlers
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Play the chord
+        this.playChordPreview(chordName);
+    }
+
+    /**
+     * Play chord preview audio
+     */
+    async playChordPreview(chordName) {
+        if (!this.chordPlayer || !this.audioSynth?.isReady()) {
+            return;
+        }
+
+        try {
+            // Stop any currently playing chords
+            this.chordPlayer.stopAll();
+            
+            // Play the new chord
+            const success = await this.chordPlayer.playChord(chordName);
+            
+            if (!success) {
+                console.warn('Could not play chord:', chordName);
+            }
+            
+        } catch (error) {
+            console.error('Error playing chord preview:', error);
+        }
+    }
+
+    /**
+     * Add click handlers to chord elements for audio preview
+     */
+    addChordClickHandlers() {
+        if (!this.audioSynth) return;
+
+        // Find all chord elements in the results (strong elements and span.chord elements)
+        const chordElements = document.querySelectorAll('strong, span.chord');
+        
+        chordElements.forEach(element => {
+            // Remove existing audio handlers to prevent duplicates
+            element.removeEventListener('click', element._chordAudioHandler);
+            
+            // Extract chord name from element
+            const chordName = this.extractChordNameFromElement(element);
+            if (chordName) {
+                // Create and store handler
+                const handler = (event) => this.handleChordClick(event, chordName);
+                element._chordAudioHandler = handler;
+                
+                // Add click handler
+                element.addEventListener('click', handler);
+                
+                // Add visual indicator for clickable chords when audio is enabled
+                if (this.audioSynth.isReady()) {
+                    element.classList.add('chord-clickable');
+                    element.title = `Click to hear ${chordName}`;
+                }
+            }
+        });
+    }
+
+    /**
+     * Extract chord name from DOM element
+     */
+    extractChordNameFromElement(element) {
+        // Try different methods to extract chord name
+        const text = element.textContent?.trim();
+        if (!text) return null;
+
+        // For chord names in results (often just the chord name)
+        if (/^[A-G][#b]?[^:\s]*$/.test(text)) {
+            return text;
+        }
+
+        // For chord suggestions or other formats, look for chord pattern
+        const chordMatch = text.match(/([A-G][#b]?[^:\s,]*)/);
+        return chordMatch ? chordMatch[1] : null;
+    }
+
+    /**
+     * Update chord click handlers when results change
+     */
+    updateChordClickHandlers() {
+        // Remove old handlers
+        document.querySelectorAll('.chord-clickable').forEach(element => {
+            element.classList.remove('chord-clickable');
+            element.removeEventListener('click', element._chordAudioHandler);
+            delete element._chordAudioHandler;
+        });
+
+        // Add new handlers if audio is enabled
+        if (this.audioSynth?.isReady()) {
+            setTimeout(() => this.addChordClickHandlers(), 100);
+        }
     }
 }

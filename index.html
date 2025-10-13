@@ -8,8 +8,23 @@
 </head>
 <body>
     <header>
-        <h1>Chord Analysis Tool</h1>
-        <p>Analyze chord progressions and discover musical possibilities</p>
+        <div class="header-content">
+            <div class="header-text">
+                <h1>Chord Analysis Tool</h1>
+                <p>Analyze chord progressions and discover musical possibilities</p>
+            </div>
+            <div class="audio-controls">
+                <button 
+                    id="audioToggle" 
+                    type="button" 
+                    class="audio-toggle audio-disabled"
+                    aria-label="Audio preview disabled"
+                    title="Enable chord preview"
+                >
+                    <span class="audio-icon">🔊</span>
+                </button>
+            </div>
+        </div>
     </header>
 
     <main>

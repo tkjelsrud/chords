@@ -69,21 +69,109 @@ body {
 
 /* ===== Header Styles ===== */
 header {
-    text-align: center;
     margin-bottom: var(--spacing-xl);
 }
 
-header h1 {
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: var(--max-width-editor);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.header-text {
+    text-align: center;
+    flex: 1;
+}
+
+.header-text h1 {
     color: var(--color-primary);
     margin: 0 0 var(--spacing-sm) 0;
     font-size: 2rem;
     font-weight: 600;
 }
 
-header p {
+.header-text p {
     color: var(--color-text-secondary);
     margin: 0;
     font-size: var(--font-size-base);
+}
+
+/* ===== Audio Controls ===== */
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.audio-toggle {
+    background: transparent;
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-lg);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.audio-toggle:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.audio-toggle:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.audio-toggle.audio-enabled {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+.audio-toggle.audio-disabled {
+    opacity: 0.6;
+}
+
+.audio-toggle.audio-disabled .audio-icon {
+    position: relative;
+}
+
+.audio-toggle.audio-disabled .audio-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -2px;
+    right: -2px;
+    height: 2px;
+    background: var(--color-text-secondary);
+    transform: translateY(-50%) rotate(-45deg);
+}
+
+/* ===== Chord Click States ===== */
+.chord-clickable {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border-radius: var(--border-radius-sm);
+}
+
+.chord-clickable:hover {
+    background: var(--color-accent) !important;
+    color: white !important;
+    transform: scale(1.05);
+}
+
+.chord-clickable:active {
+    transform: scale(0.95);
 }
 
 /* ===== Chord Highlighting ===== */
@@ -128,6 +216,23 @@ header p {
     width: 100%;
     max-width: var(--max-width-editor);
     margin: 0 auto;
+}
+
+/* Editor section wrapper - provides space for floating results */
+.editor-section {
+    position: relative;
+    padding-left: 320px; /* Space for floating results on the left */
+}
+
+/* Floating results positioned relative to editor section */
+.editor-section #floatingResultsContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 320px; /* Width of the left space */
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--z-index-floating);
 }
 
 /* Main chord editor */
@@ -184,8 +289,12 @@ header p {
 /* Floating results container */
 #floatingResultsContainer {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
     pointer-events: none; /* Prevent interaction interference */
+    z-index: var(--z-index-floating);
 }
 
 /* Floating chord analysis results */
@@ -196,22 +305,24 @@ header p {
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     font-size: var(--font-size-xs);
-    max-width: 75%;
+    max-width: 300px; /* Fixed max width for consistency */
+    min-width: 200px; /* Minimum width to prevent cramped text */
     opacity: 0.9;
     border-bottom: 2px solid rgba(149, 149, 149, 0.9);
     z-index: var(--z-index-floating);
-    transform: translateY(-100%);
     white-space: normal;
     text-align: left;
     pointer-events: auto; /* Allow clicking on results */
     cursor: pointer;
-    transition: opacity var(--transition-fast), transform var(--transition-fast);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
     backdrop-filter: blur(2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .chord-results:hover {
     opacity: 1;
-    transform: translateY(-100%) scale(1.02);
+    transform: translateX(-100%) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Suggestions within results */
@@ -410,11 +521,49 @@ header p {
         font-size: 10px;
         max-width: 90%;
     }
+    
+    /* Mobile: Stack results below editor instead of beside */
+    .editor-section {
+        padding-left: 0;
+    }
+    
+    .editor-section #floatingResultsContainer {
+        position: static;
+        width: 100%;
+        margin-top: var(--spacing-md);
+    }
+    
+    .chord-results {
+        position: static;
+        transform: none;
+        margin-bottom: var(--spacing-sm);
+        max-width: 100%;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    
+    .audio-toggle {
+        width: 40px;
+        height: 40px;
+    }
 }
 
 @media (max-width: 480px) {
-    header h1 {
+    .header-text h1 {
         font-size: 1.5rem;
+    }
+    
+    .header-content {
+        padding: 0 var(--spacing-xs);
+    }
+    
+    .audio-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
     }
     
     #chordEditor {
