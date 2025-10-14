@@ -10,6 +10,7 @@ import { DataLoader } from './modules/DataLoader.js';
 import { Analytics } from './modules/Analytics.js';
 import { AudioSynth } from './modules/AudioSynth.js';
 import { ChordPlayer } from './modules/ChordPlayer.js';
+import { FretboardGrid } from './modules/FretboardGrid.js';
 
 class ChordApp {
     constructor() {
@@ -20,6 +21,10 @@ class ChordApp {
         this.analytics = new Analytics();
         this.audioSynth = new AudioSynth();
         this.chordPlayer = null;
+        this.fretboardGrid = null;
+        
+        // Current mode - 'chord' or 'fretboard'
+        this.currentMode = 'chord';
         
         this.init();
     }
@@ -37,6 +42,9 @@ class ChordApp {
             
             // Initialize audio modules
             this.chordPlayer = new ChordPlayer(this.audioSynth);
+            
+            // Initialize fretboard grid
+            this.fretboardGrid = new FretboardGrid(this.audioSynth);
             
             // Initialize UI with all dependencies
             this.uiManager = new UIManager(this.chordAnalyzer, this.tabManager, this.analytics, this.audioSynth, this.chordPlayer);
@@ -115,6 +123,78 @@ class ChordApp {
         this.uiManager.on('chordAnalysis', (results) => {
             this.analytics.trackChordInput(results.inputChords);
         });
+
+        // Set up fretboard toggle
+        this.setupFretboardToggle();
+    }
+
+    /**
+     * Set up fretboard mode toggle functionality
+     */
+    setupFretboardToggle() {
+        const fretboardToggle = document.getElementById('fretboardToggle');
+        const fretboardContainer = document.getElementById('fretboardContainer');
+        
+        if (!fretboardToggle || !fretboardContainer) {
+            console.warn('Fretboard toggle elements not found');
+            return;
+        }
+
+        // Initialize fretboard grid
+        this.fretboardGrid.init(fretboardContainer);
+
+        // Add click handler
+        fretboardToggle.addEventListener('click', () => {
+            this.toggleMode();
+        });
+    }
+
+    /**
+     * Toggle between chord analysis mode and fretboard mode
+     */
+    toggleMode() {
+        const fretboardToggle = document.getElementById('fretboardToggle');
+        const fretboardSection = document.getElementById('fretboardSection');
+        const editorSection = document.querySelector('.editor-section');
+        const resultsSection = document.querySelector('.results-section');
+
+        if (this.currentMode === 'chord') {
+            // Switch to fretboard mode
+            this.currentMode = 'fretboard';
+            fretboardToggle.classList.add('active');
+            fretboardToggle.setAttribute('aria-label', 'Switch to chord mode');
+            fretboardToggle.title = 'Switch back to chord analysis';
+            
+            // Hide chord analysis UI
+            if (editorSection) editorSection.style.display = 'none';
+            if (resultsSection) resultsSection.style.display = 'none';
+            
+            // Show fretboard UI
+            if (fretboardSection) {
+                fretboardSection.style.display = 'block';
+                this.fretboardGrid.show();
+            }
+            
+            console.log('Switched to fretboard mode');
+        } else {
+            // Switch to chord mode
+            this.currentMode = 'chord';
+            fretboardToggle.classList.remove('active');
+            fretboardToggle.setAttribute('aria-label', 'Switch to fretboard mode');
+            fretboardToggle.title = 'Switch to fretboard melody sketcher';
+            
+            // Hide fretboard UI
+            if (fretboardSection) {
+                fretboardSection.style.display = 'none';
+                this.fretboardGrid.hide();
+            }
+            
+            // Show chord analysis UI
+            if (editorSection) editorSection.style.display = 'block';
+            if (resultsSection) resultsSection.style.display = 'block';
+            
+            console.log('Switched to chord mode');
+        }
     }
 
     handleURLParameters() {

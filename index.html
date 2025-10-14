@@ -23,6 +23,15 @@
                 >
                     <span class="audio-icon">🔊</span>
                 </button>
+                <button 
+                    id="fretboardToggle" 
+                    type="button" 
+                    class="mode-toggle"
+                    aria-label="Switch to fretboard mode"
+                    title="Switch to fretboard melody sketcher"
+                >
+                    <span class="fretboard-icon">🎸</span>
+                </button>
             </div>
         </div>
     </header>
@@ -48,8 +57,31 @@
                     aria-label="Chord progression input"
                     aria-describedby="instructions"
                 ></div>
-                <div id="instructions" class="instructions">
-                    Type chords like: C Am F G or Cmaj7 Dm7 G7 Cmaj7
+                <div class="instructions-row">
+                    <div id="instructions" class="instructions">
+                        Type chords like: C Am F G or Cmaj7 Dm7 G7 Cmaj7
+                    </div>
+                    <div class="transpose-controls">
+                        <span id="transposeLabel" class="transpose-label"></span>
+                        <button 
+                            id="transposeDown" 
+                            type="button" 
+                            class="transpose-btn transpose-down"
+                            aria-label="Transpose down by semitone"
+                            title="Transpose down by semitone"
+                        >
+                            ♭
+                        </button>
+                        <button 
+                            id="transposeUp" 
+                            type="button" 
+                            class="transpose-btn transpose-up"
+                            aria-label="Transpose up by semitone"
+                            title="Transpose up by semitone"
+                        >
+                            ♯
+                        </button>
+                    </div>
                 </div>
             </div>
             <div id="floatingResultsContainer" aria-live="polite"></div>
@@ -57,6 +89,10 @@
 
         <section class="results-section">
             <div id="details" aria-live="polite" aria-label="Chord analysis results"></div>
+        </section>
+
+        <section class="fretboard-section" id="fretboardSection" style="display: none;">
+            <div id="fretboardContainer"></div>
         </section>
     </main>
 

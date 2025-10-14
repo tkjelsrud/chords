@@ -265,6 +265,68 @@ header {
     font-style: italic;
 }
 
+/* Transpose Controls */
+.instructions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-sm);
+    gap: var(--spacing-md);
+}
+
+.chord-input-row #chordEditor {
+    flex: 1;
+}
+
+.transpose-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+}
+
+.transpose-btn {
+    background: var(--color-bg-main);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+    transition: all var(--transition-fast);
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
+}
+
+.transpose-btn:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.transpose-btn:active {
+    transform: translateY(0);
+    background: var(--color-primary);
+    color: white;
+}
+
+.transpose-label {
+    font-size: var(--font-size-sm);
+    font-weight: bold;
+    color: var(--color-primary);
+    min-width: 20px;
+    text-align: center;
+    padding: var(--spacing-xs);
+    background: var(--color-primary-light);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-primary);
+    display: none; /* Hidden by default when transposition is 0 */
+}
+
 /* Instructions */
 .instructions {
     font-size: var(--font-size-sm);
@@ -517,6 +579,22 @@ header {
         padding: var(--spacing-sm);
     }
     
+    .instructions-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .transpose-controls {
+        align-self: flex-end;
+    }
+    
+    .transpose-btn {
+        min-width: 36px;
+        min-height: 36px;
+        font-size: var(--font-size-base);
+    }
+    
     .chord-results {
         font-size: 10px;
         max-width: 90%;
@@ -676,5 +754,224 @@ header {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===== Fretboard Grid Styles ===== */
+
+.mode-toggle {
+    background: var(--color-bg-main);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-left: var(--spacing-sm);
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    transition: all 0.2s ease;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mode-toggle:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+}
+
+.mode-toggle.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary-dark);
+}
+
+.fretboard-section {
+    padding: var(--spacing-xl);
+    background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border);
+}
+
+.fretboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.fretboard-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xxl);
+}
+
+.fretboard-header h3 {
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+    font-size: 24px;
+}
+
+.fretboard-header p {
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-size: var(--font-size-base);
+}
+
+.fretboard-grid {
+    background: #B8B5B0; /* Lighter, more neutral fretboard */
+    border-radius: var(--spacing-sm);
+    padding: var(--spacing-xl);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin: 0 auto;
+    position: relative;
+}
+
+.guitar-string {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+}
+
+.guitar-string:last-child {
+    margin-bottom: 0;
+}
+
+.string-label {
+    font-weight: bold;
+    color: var(--color-text-primary);
+    background: var(--color-bg-main);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius);
+    margin-right: var(--spacing-lg);
+    min-width: 120px;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    border: 1px solid var(--color-border);
+}
+
+.frets {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    background: linear-gradient(to right, #C8C5C0 0%, #B8B5B0 100%);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-xs) 0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.fret {
+    flex: 1;
+    height: 50px;
+    border: 1px solid #9A9A9A;
+    background: linear-gradient(to bottom, #E8E6E1, #D0CDC8);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    position: relative;
+    border-radius: var(--border-radius-sm);
+    margin: 0 1px;
+    font-size: var(--font-size-xs);
+    text-align: center;
+}
+
+.fret:hover {
+    background: linear-gradient(to bottom, #F0EFEB, #E0DDD8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.fret.active {
+    background: linear-gradient(to bottom, #FFD700, #FFA500) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4);
+    animation: fret-pulse 0.3s ease;
+}
+
+@keyframes fret-pulse {
+    0% { transform: translateY(-3px) scale(1); }
+    50% { transform: translateY(-3px) scale(1.1); }
+    100% { transform: translateY(-3px) scale(1); }
+}
+
+.fret.open-string {
+    background: linear-gradient(to bottom, #F0F0F0, #DCDCDC);
+    border-color: #999;
+}
+
+.fret.open-string:hover {
+    background: linear-gradient(to bottom, #FFFACD, #F0E68C);
+}
+
+.fret-marker {
+    position: relative;
+}
+
+.fret-marker::after {
+    content: '●';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #2F4F4F;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.fret-number {
+    font-weight: bold;
+    color: #2F4F4F;
+    font-size: 10px;
+    line-height: 1;
+}
+
+.note-name {
+    font-weight: 600;
+    color: #000080;
+    font-size: 11px;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+.fretboard-info {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+    padding: var(--spacing-md);
+    background: var(--color-bg-main);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-border);
+}
+
+.current-note {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--color-text-primary);
+    min-height: 20px;
+}
+
+/* Responsive design for fretboard */
+@media (max-width: 768px) {
+    .fretboard-grid {
+        padding: var(--spacing-md);
+    }
+    
+    .guitar-string {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .string-label {
+        margin-right: 0;
+        margin-bottom: var(--spacing-sm);
+        min-width: auto;
+    }
+    
+    .fret {
+        height: 40px;
+        font-size: 10px;
+    }
+    
+    .fret-number, .note-name {
+        font-size: 9px;
     }
 }

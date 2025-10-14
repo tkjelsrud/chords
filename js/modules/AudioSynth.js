@@ -188,6 +188,48 @@ export class AudioSynth {
     }
 
     /**
+     * Stop a specific note by its ID or frequency
+     * @param {string|number} noteIdentifier - Note ID or frequency to stop
+     */
+    stopNote(noteIdentifier) {
+        if (!this.audioContext) return;
+        
+        const now = this.audioContext.currentTime;
+        let noteToStop = null;
+        let noteIdToDelete = null;
+        
+        // Find note by ID or frequency
+        for (const [noteId, noteData] of this.activeOscillators) {
+            if (noteId === noteIdentifier || 
+                (typeof noteIdentifier === 'number' && noteId.startsWith(`${noteIdentifier}_`))) {
+                noteToStop = noteData;
+                noteIdToDelete = noteId;
+                break;
+            }
+        }
+        
+        if (noteToStop) {
+            try {
+                const { oscillator, gainNode } = noteToStop;
+                
+                // Fast release to stop gracefully
+                gainNode.gain.cancelScheduledValues(now);
+                gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.05);
+                
+                // Schedule stop
+                oscillator.stop(now + 0.05);
+                
+                // Remove from active oscillators
+                this.activeOscillators.delete(noteIdToDelete);
+                
+            } catch (error) {
+                console.warn('Error stopping specific note:', error);
+            }
+        }
+    }
+
+    /**
      * Set master volume (0-1)
      */
     setVolume(volume) {

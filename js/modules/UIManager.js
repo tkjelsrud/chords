@@ -24,6 +24,14 @@ export class UIManager {
         this.lastAnalyzedText = '';
         this.debounceTimer = null;
         this.selectionRange = null;
+        this.transposition = 0; // Current transposition in semitones
+        
+        // Chromatic notes for transposition
+        this.chromaticNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        this.enharmonicMap = {
+            'C#': 'Db', 'D#': 'Eb', 'F#': 'Gb', 'G#': 'Ab', 'A#': 'Bb',
+            'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#'
+        };
         
         // Performance monitoring
         this.performanceMetrics = {
@@ -47,6 +55,7 @@ export class UIManager {
         this.setupMutationObserver();
         this.renderTabs();
         this.loadActiveTab();
+        this.updateTransposeLabel(); // Initialize transpose label
     }
 
     /**
@@ -59,6 +68,11 @@ export class UIManager {
         this.detailsContainer = document.getElementById('details');
         this.addTabButton = document.getElementById('addTab');
         this.audioToggle = document.getElementById('audioToggle');
+        
+        // Transpose controls
+        this.transposeUpBtn = document.getElementById('transposeUp');
+        this.transposeDownBtn = document.getElementById('transposeDown');
+        this.transposeLabel = document.getElementById('transposeLabel');
         
         if (!this.editor || !this.tabsContainer) {
             throw new Error('Required DOM elements not found');
@@ -81,6 +95,19 @@ export class UIManager {
         // Audio toggle event
         if (this.audioToggle) {
             this.audioToggle.addEventListener('click', this.handleAudioToggle.bind(this));
+        }
+        
+        // Transpose button events
+        if (this.transposeUpBtn) {
+            this.transposeUpBtn.addEventListener('click', this.handleTransposeUp.bind(this));
+        }
+        if (this.transposeDownBtn) {
+            this.transposeDownBtn.addEventListener('click', this.handleTransposeDown.bind(this));
+        }
+        if (this.transposeLabel) {
+            this.transposeLabel.addEventListener('dblclick', this.resetTransposition.bind(this));
+            this.transposeLabel.style.cursor = 'pointer';
+            this.transposeLabel.title = 'Double-click to reset';
         }
         
         // Tab manager events
@@ -389,32 +416,33 @@ Keyboard Shortcuts:
             };
         }
 
-        // Process only text nodes to avoid breaking existing chord spans
-        const textNodes = [...this.editor.childNodes].filter(node => node.nodeType === 3);
+        // Get the text content for processing (this will strip HTML)
+        const textContent = this.editor.textContent || this.editor.innerText || '';
         
-        textNodes.forEach(node => {
-            // Fixed chord regex that properly handles # and b accidentals
-            const chordRegex = /(?:^|[\s,])([A-G](?:#|b|♯|♭)?(?:maj7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
-            const originalText = node.textContent;
-            const formatted = originalText.replace(chordRegex, (match, chord) => {
-                // Preserve the spacing around the chord
-                const prefix = match.match(/^[\s,]*/)[0];
-                return `${prefix}<span class="chord">${chord}</span>`;
-            });
-
-            // Only replace if content actually changed (avoids unnecessary DOM thrashing)
-            if (originalText !== formatted && formatted.includes('<span class="chord">')) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = formatted;
-                
-                // Replace the text node with formatted content
-                const fragment = document.createDocumentFragment();
-                while (tempDiv.firstChild) {
-                    fragment.appendChild(tempDiv.firstChild);
-                }
-                node.replaceWith(fragment);
-            }
+        // Fixed chord regex that properly handles # and b accidentals
+        const chordRegex = /(?:^|[\s,])([A-G](?:#|b|♯|♭)?(?:maj7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
+        
+        // First, extract existing chord spans and preserve their original chord data
+        const existingChords = new Map();
+        const originalHTML = this.editor.innerHTML;
+        originalHTML.replace(/<span class="chord"[^>]*data-original-chord="([^"]*)"[^>]*>([^<]+)<\/span>/g, (match, originalChord, currentText) => {
+            existingChords.set(currentText, originalChord);
+            return match;
         });
+        
+        // Apply chord formatting to the plain text content
+        const formattedHTML = textContent.replace(chordRegex, (match, chord) => {
+            // Preserve the spacing around the chord
+            const prefix = match.match(/^[\s,]*/)[0];
+            // Use preserved original chord or current chord for new spans
+            const originalChord = existingChords.get(chord) || chord;
+            return `${prefix}<span class="chord" data-original-chord="${originalChord}">${chord}</span>`;
+        });
+
+        // Only update if content actually changed
+        if (originalHTML !== formattedHTML) {
+            this.editor.innerHTML = formattedHTML;
+        }
 
         // Carefully restore selection - improved cursor position handling
         if (selectionInfo && selection) {
@@ -608,7 +636,24 @@ Keyboard Shortcuts:
      * Fixed: Better regex that handles # and b properly without word boundaries
      */
     extractChordsFromLine(line) {
-        // More precise regex that doesn't rely on word boundaries for accidentals
+        // For HTML content with chord spans, extract original chords from data attributes
+        if (line.includes('span class="chord"')) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = line;
+            const chordSpans = tempDiv.querySelectorAll('span.chord');
+            const matches = [];
+            
+            chordSpans.forEach(span => {
+                const originalChord = span.getAttribute('data-original-chord') || span.textContent;
+                if (originalChord && !matches.includes(originalChord)) {
+                    matches.push(originalChord);
+                }
+            });
+            
+            return matches;
+        }
+        
+        // For plain text, use regex extraction
         const chordRegex = /(?:^|[\s,]|^)([A-G](?:#|b|♯|♭)?(?:maj7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
         const matches = [];
         let match;
@@ -739,6 +784,134 @@ Keyboard Shortcuts:
      */
     clearDetails() {
         this.detailsContainer.innerHTML = '';
+    }
+
+    /**
+     * Handle transpose up button click
+     */
+    handleTransposeUp() {
+        this.transposition += 1;
+        this.updateTransposeLabel();
+        this.reanalyzeWithTransposition();
+    }
+
+    /**
+     * Handle transpose down button click
+     */
+    handleTransposeDown() {
+        this.transposition -= 1;
+        this.updateTransposeLabel();
+        this.reanalyzeWithTransposition();
+    }
+
+    /**
+     * Reset transposition to zero
+     */
+    resetTransposition() {
+        this.transposition = 0;
+        this.updateTransposeLabel();
+        this.updateChordSpansWithTransposition();
+        // Force reanalysis
+        this.lastAnalyzedText = '';
+        this.analyzeCurrentContent();
+    }
+
+    /**
+     * Update the transpose label display
+     */
+    updateTransposeLabel() {
+        if (!this.transposeLabel) return;
+        
+        if (this.transposition === 0) {
+            this.transposeLabel.textContent = '';
+            this.transposeLabel.style.display = 'none';
+        } else {
+            const sign = this.transposition > 0 ? '+' : '';
+            this.transposeLabel.textContent = `${sign}${this.transposition}`;
+            this.transposeLabel.style.display = 'inline';
+        }
+    }
+
+    /**
+     * Transpose a chord by the given number of semitones
+     */
+    transposeChord(chord, semitones) {
+        if (!chord || semitones === 0) return chord;
+        
+        // Extract root note and modifiers
+        const chordRegex = /^([A-G])(#|b|♯|♭)?(.*)/;
+        const match = chord.match(chordRegex);
+        
+        if (!match) return chord;
+        
+        const [, root, accidental, suffix] = match;
+        let fullRoot = root + (accidental || '');
+        
+        // Convert to standard notation
+        if (fullRoot.includes('♯')) fullRoot = fullRoot.replace('♯', '#');
+        if (fullRoot.includes('♭')) fullRoot = fullRoot.replace('♭', 'b');
+        
+        // Find current position in chromatic scale
+        let currentIndex = this.chromaticNotes.indexOf(fullRoot);
+        
+        // Handle enharmonic equivalents
+        if (currentIndex === -1) {
+            const enharmonic = this.enharmonicMap[fullRoot];
+            if (enharmonic) {
+                currentIndex = this.chromaticNotes.indexOf(enharmonic);
+            }
+        }
+        
+        if (currentIndex === -1) return chord; // Couldn't find the note
+        
+        // Calculate new position
+        let newIndex = (currentIndex + semitones) % 12;
+        if (newIndex < 0) newIndex += 12;
+        
+        const newRoot = this.chromaticNotes[newIndex];
+        return newRoot + suffix;
+    }
+
+    /**
+     * Reanalyze chords with current transposition applied
+     */
+    reanalyzeWithTransposition() {
+        // Apply transposition to existing chord spans
+        this.updateChordSpansWithTransposition();
+        
+        // Then analyze the transposed content
+        setTimeout(() => {
+            this.lastAnalyzedText = '';
+            this.analyzeCurrentContent();
+        }, 10);
+    }
+
+    /**
+     * Update chord spans in the editor with transposed chords
+     */
+    updateChordSpansWithTransposition() {
+        const chordSpans = this.editor.querySelectorAll('span.chord');
+        
+        chordSpans.forEach(span => {
+            // Get the original chord if stored
+            let originalChord = span.getAttribute('data-original-chord');
+            
+            // If no original chord stored, store the current text as original
+            // BUT only if we haven't transposed yet (to avoid storing transposed values as originals)
+            if (!originalChord) {
+                originalChord = span.textContent;
+                span.setAttribute('data-original-chord', originalChord);
+            }
+            
+            // Apply transposition to the original chord
+            if (this.transposition !== 0) {
+                const transposedChord = this.transposeChord(originalChord, this.transposition);
+                span.textContent = transposedChord;
+            } else {
+                // Reset to original if no transposition
+                span.textContent = originalChord;
+            }
+        });
     }
 
     /**
