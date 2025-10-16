@@ -78,7 +78,7 @@ export class ChordAnalyzer {
     validateAndCleanChords(inputChords) {
         const validChords = [];
         const errors = [];
-        const chordPattern = /^[A-G](?:#|b|♯|♭)?(?:maj7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?$/i;
+        const chordPattern = /^[A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?$/i;
         
         inputChords.forEach((chord, index) => {
             // Check if chord is a string

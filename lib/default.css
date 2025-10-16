@@ -314,6 +314,49 @@ header {
     color: white;
 }
 
+.share-btn {
+    background: var(--color-bg-main);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    font-size: var(--font-size-lg);
+    transition: all var(--transition-fast);
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
+    margin-left: var(--spacing-sm);
+}
+
+.share-btn:hover {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.share-btn:active {
+    transform: translateY(0);
+    background: var(--color-secondary);
+    color: white;
+}
+
+.share-btn.copied {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+    animation: flash-success 0.3s ease-out;
+}
+
+@keyframes flash-success {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
 .transpose-label {
     font-size: var(--font-size-sm);
     font-weight: bold;

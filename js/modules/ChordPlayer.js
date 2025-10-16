@@ -69,6 +69,9 @@ export class ChordPlayer {
             'Δ7': 'maj7',
             'M7': 'maj7',
             'maj7': 'maj7',
+            'Maj7': 'maj7',     // Capital M variant
+            'May7': 'maj7',     // Alternative spelling
+            'may7': 'maj7',     // Lowercase variant
             'min7': 'm7',
             '-7': 'm7',
             'ø7': 'm7b5',

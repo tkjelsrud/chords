@@ -202,13 +202,58 @@ class ChordApp {
         const inputChords = urlParams.get('in');
         
         if (inputChords) {
-            const decodedChords = decodeURIComponent(inputChords)
-                .replace(/\+/g, ' ')
-                .replace(/%23/g, '#');
-            
-            this.tabManager.setActiveTabContent(decodedChords);
-            this.uiManager.setEditorContent(decodedChords);
+            try {
+                // Decode the chord input from URL
+                const decodedChords = this.decodeChordInput(inputChords);
+                
+                // Set content in both tab manager and UI
+                this.tabManager.setActiveTabContent(decodedChords);
+                this.uiManager.setEditorContent(decodedChords);
+                
+                console.log('Loaded chords from URL:', decodedChords);
+            } catch (error) {
+                console.error('Error parsing URL parameters:', error);
+                this.showErrorMessage('Invalid chord data in URL', 'warning');
+            }
         }
+    }
+    
+    /**
+     * Decode chord input from URL parameter
+     * @param {string} encoded - URL encoded chord string
+     * @returns {string} Decoded chord string
+     */
+    decodeChordInput(encoded) {
+        return decodeURIComponent(encoded)
+            .replace(/\+/g, ' ')           // Replace + with spaces
+            .replace(/%23/g, '#')          // Replace encoded # symbols
+            .replace(/%2B/g, '+')          // Replace encoded + symbols (for aug chords)
+            .trim();
+    }
+    
+    /**
+     * Encode chord input for URL parameter
+     * @param {string} chordInput - Raw chord string
+     * @returns {string} URL encoded chord string
+     */
+    encodeChordInput(chordInput) {
+        return encodeURIComponent(chordInput.trim())
+            .replace(/%20/g, '+');         // Use + for spaces (more readable)
+    }
+    
+    /**
+     * Generate shareable URL with current chord content
+     * @returns {string} Shareable URL
+     */
+    generateShareableURL() {
+        const currentContent = this.uiManager.getEditorContent();
+        if (!currentContent.trim()) {
+            return window.location.origin + window.location.pathname;
+        }
+        
+        const encoded = this.encodeChordInput(currentContent);
+        const baseURL = window.location.origin + window.location.pathname;
+        return `${baseURL}?in=${encoded}`;
     }
 
     showErrorMessage(message, type = 'error') {

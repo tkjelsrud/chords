@@ -74,6 +74,9 @@ export class UIManager {
         this.transposeDownBtn = document.getElementById('transposeDown');
         this.transposeLabel = document.getElementById('transposeLabel');
         
+        // Share button
+        this.shareBtn = document.getElementById('shareBtn');
+        
         if (!this.editor || !this.tabsContainer) {
             throw new Error('Required DOM elements not found');
         }
@@ -108,6 +111,11 @@ export class UIManager {
             this.transposeLabel.addEventListener('dblclick', this.resetTransposition.bind(this));
             this.transposeLabel.style.cursor = 'pointer';
             this.transposeLabel.title = 'Double-click to reset';
+        }
+        
+        // Share button event
+        if (this.shareBtn) {
+            this.shareBtn.addEventListener('click', this.handleShare.bind(this));
         }
         
         // Tab manager events
@@ -404,23 +412,28 @@ Keyboard Shortcuts:
         // Store selection info before DOM changes
         const selection = window.getSelection();
         let selectionInfo = null;
+        let originalTextContent = '';
         
         if (selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
+            originalTextContent = this.editor.textContent || this.editor.innerText || '';
+            
             selectionInfo = {
                 startContainer: range.startContainer,
                 startOffset: range.startOffset,
                 endContainer: range.endContainer,
                 endOffset: range.endOffset,
-                collapsed: range.collapsed
+                collapsed: range.collapsed,
+                // Calculate the text offset from the beginning of the editor
+                textOffset: this.getTextOffset(range.startContainer, range.startOffset)
             };
         }
 
         // Get the text content for processing (this will strip HTML)
         const textContent = this.editor.textContent || this.editor.innerText || '';
         
-        // Fixed chord regex that properly handles # and b accidentals
-        const chordRegex = /(?:^|[\s,])([A-G](?:#|b|♯|♭)?(?:maj7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
+        // Fixed chord regex that properly handles # and b accidentals and Major7 variations
+        const chordRegex = /(?:^|[\s,])([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
         
         // First, extract existing chord spans and preserve their original chord data
         const existingChords = new Map();
@@ -442,66 +455,79 @@ Keyboard Shortcuts:
         // Only update if content actually changed
         if (originalHTML !== formattedHTML) {
             this.editor.innerHTML = formattedHTML;
+            
+            // Restore cursor position after DOM update
+            this.restoreCursorPosition(selectionInfo, selection);
         }
-
-        // Carefully restore selection - improved cursor position handling
-        if (selectionInfo && selection) {
-            try {
-                // Create a text walker to find the correct position after DOM changes
-                const walker = document.createTreeWalker(
-                    this.editor,
-                    NodeFilter.SHOW_TEXT,
-                    null,
-                    false
-                );
+    }
+    
+    /**
+     * Restore cursor position after DOM manipulation
+     */
+    restoreCursorPosition(selectionInfo, selection) {
+        if (!selectionInfo || !selection) return;
+        
+        try {
+            // Create a text walker to find all text nodes
+            const walker = document.createTreeWalker(
+                this.editor,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            let currentOffset = 0;
+            let targetNode = null;
+            let targetOffset = 0;
+            const originalOffset = selectionInfo.textOffset;
+            
+            // Find the correct text node and offset
+            let node;
+            while (node = walker.nextNode()) {
+                const nodeLength = node.textContent.length;
                 
-                let currentOffset = 0;
-                let targetNode = null;
-                let targetOffset = 0;
-                
-                // Calculate original cursor position as text offset
-                const originalOffset = this.getTextOffset(selectionInfo.startContainer, selectionInfo.startOffset);
-                
-                // Find the new position after DOM changes
-                let node;
-                while (node = walker.nextNode()) {
-                    const nodeLength = node.textContent.length;
-                    if (currentOffset + nodeLength >= originalOffset) {
-                        targetNode = node;
-                        targetOffset = originalOffset - currentOffset;
-                        break;
-                    }
-                    currentOffset += nodeLength;
+                if (currentOffset + nodeLength >= originalOffset) {
+                    targetNode = node;
+                    targetOffset = originalOffset - currentOffset;
+                    break;
                 }
-                
-                if (targetNode) {
-                    const newRange = document.createRange();
-                    newRange.setStart(targetNode, Math.min(targetOffset, targetNode.textContent.length));
-                    newRange.collapse(true);
-                    
-                    selection.removeAllRanges();
-                    selection.addRange(newRange);
-                } else {
-                    // Fallback: place cursor at end
-                    const range = document.createRange();
-                    range.selectNodeContents(this.editor);
-                    range.collapse(false);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                }
-            } catch (error) {
-                console.warn('Selection restoration failed:', error);
-                // Try simple fallback
-                try {
-                    const range = document.createRange();
-                    range.selectNodeContents(this.editor);
-                    range.collapse(false);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                } catch (fallbackError) {
-                    selection.removeAllRanges();
-                }
+                currentOffset += nodeLength;
             }
+            
+            if (targetNode) {
+                // Ensure target offset doesn't exceed node length
+                targetOffset = Math.min(targetOffset, targetNode.textContent.length);
+                
+                const newRange = document.createRange();
+                newRange.setStart(targetNode, targetOffset);
+                newRange.collapse(true);
+                
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            } else {
+                // Fallback: place cursor at end
+                this.placeCursorAtEnd();
+            }
+        } catch (error) {
+            console.warn('Cursor restoration failed:', error);
+            // Fallback to placing cursor at end
+            this.placeCursorAtEnd();
+        }
+    }
+    
+    /**
+     * Place cursor at the end of the editor content
+     */
+    placeCursorAtEnd() {
+        try {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(this.editor);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } catch (error) {
+            console.warn('Failed to place cursor at end:', error);
         }
     }
 
@@ -654,7 +680,7 @@ Keyboard Shortcuts:
         }
         
         // For plain text, use regex extraction
-        const chordRegex = /(?:^|[\s,]|^)([A-G](?:#|b|♯|♭)?(?:maj7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
+        const chordRegex = /(?:^|[\s,]|^)([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
         const matches = [];
         let match;
         
@@ -830,6 +856,135 @@ Keyboard Shortcuts:
             this.transposeLabel.textContent = `${sign}${this.transposition}`;
             this.transposeLabel.style.display = 'inline';
         }
+    }
+
+    /**
+     * Handle share button click
+     */
+    async handleShare() {
+        try {
+            const currentContent = this.getEditorContent();
+            if (!currentContent.trim()) {
+                this.showNotification('Enter some chords to share', 'warning');
+                return;
+            }
+
+            // Generate shareable URL using the app's method
+            const shareableURL = window.app?.generateShareableURL() || this.generateFallbackShareURL(currentContent);
+            
+            // Try to use the modern Clipboard API
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(shareableURL);
+                this.showShareSuccess();
+            } else {
+                // Fallback for older browsers or non-secure contexts
+                this.fallbackCopyToClipboard(shareableURL);
+                this.showShareSuccess();
+            }
+            
+        } catch (error) {
+            console.error('Share failed:', error);
+            this.showNotification('Failed to copy link', 'error');
+        }
+    }
+
+    /**
+     * Generate fallback share URL if app reference is not available
+     */
+    generateFallbackShareURL(content) {
+        const encoded = encodeURIComponent(content.trim()).replace(/%20/g, '+');
+        const baseURL = window.location.origin + window.location.pathname;
+        return `${baseURL}?in=${encoded}`;
+    }
+
+    /**
+     * Fallback clipboard copy for older browsers
+     */
+    fallbackCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+    }
+
+    /**
+     * Show share success feedback
+     */
+    showShareSuccess() {
+        if (this.shareBtn) {
+            const originalContent = this.shareBtn.innerHTML;
+            const originalTitle = this.shareBtn.title;
+            
+            // Add success class and change content
+            this.shareBtn.classList.add('copied');
+            this.shareBtn.innerHTML = '✓';
+            this.shareBtn.title = 'Link copied!';
+            
+            // Reset after animation
+            setTimeout(() => {
+                this.shareBtn.classList.remove('copied');
+                this.shareBtn.innerHTML = originalContent;
+                this.shareBtn.title = originalTitle;
+            }, 1000);
+        }
+        
+        this.showNotification('Shareable link copied to clipboard!', 'success');
+    }
+
+    /**
+     * Show notification message
+     */
+    showNotification(message, type = 'info') {
+        // Create or update existing notification
+        let notification = document.getElementById('notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'notification';
+            document.body.appendChild(notification);
+        }
+
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        `;
+
+        // Color based on type
+        const colors = {
+            success: '#4CAF50',
+            error: '#f44336',
+            warning: '#ff9800',
+            info: '#2196F3'
+        };
+        notification.style.backgroundColor = colors[type] || colors.info;
+
+        // Animate in
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 10);
+
+        // Auto hide after 3 seconds
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
     }
 
     /**
