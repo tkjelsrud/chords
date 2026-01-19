@@ -189,6 +189,17 @@ header {
     color: white;
 }
 
+/* Chords that don't match the current scale */
+.chord.out-of-key {
+    color: #e76f51;
+    background: rgba(231, 111, 81, 0.1);
+}
+
+.chord.out-of-key:hover {
+    background: #e76f51;
+    color: white;
+}
+
 .accidental {
     display: inline-block;
     width: auto;

@@ -52,7 +52,7 @@ export class UIManager {
     init() {
         this.bindDOMElements();
         this.setupEventListeners();
-        this.setupMutationObserver();
+        // this.setupMutationObserver(); // Disabled for stability - using delayed formatting instead
         this.renderTabs();
         this.loadActiveTab();
         this.updateTransposeLabel(); // Initialize transpose label
@@ -157,16 +157,15 @@ export class UIManager {
         // Update tab content
         this.tabManager.updateActiveTabContent(content);
         
-        // Format chords immediately for visual feedback
-        this.formatChords();
-        
-        // Adaptive debouncing - shorter for small inputs, longer for large inputs
-        clearTimeout(this.debounceTimer);
-        const debounceDelay = Math.min(500, Math.max(100, content.length * 2));
-        
-        this.debounceTimer = setTimeout(() => {
+        // Format chords after 2 seconds of inactivity (hybrid approach for stability)
+        clearTimeout(this.formatTimer);
+        this.formatTimer = setTimeout(() => {
+            this.formatChords();
+            // Analyze after formatting so chord spans exist for highlighting
             this.analyzeCurrentContent();
-        }, debounceDelay);
+        }, 2000);
+        
+        // Don't analyze separately - it will happen after formatting
     }
 
     /**
@@ -276,6 +275,8 @@ export class UIManager {
      */
     handleEditorBlur() {
         this.editor.classList.remove('focused');
+        // Format chords when leaving editor
+        this.formatChords();
     }
 
     /**
@@ -367,6 +368,32 @@ export class UIManager {
     }
 
     /**
+     * Ensure cursor is not inside a chord span (prevents typing from being formatted as chord)
+     */
+    ensureCursorOutsideChordSpan() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+        
+        const range = selection.getRangeAt(0);
+        let node = range.startContainer;
+        
+        // Walk up the DOM tree to see if we're inside a chord span
+        while (node && node !== this.editor) {
+            if (node.nodeType === Node.ELEMENT_NODE && 
+                node.classList && node.classList.contains('chord')) {
+                // We're inside a chord span - move cursor to after it
+                const newRange = document.createRange();
+                newRange.setStartAfter(node);
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+                break;
+            }
+            node = node.parentNode;
+        }
+    }
+
+    /**
      * Navigate between tabs
      * @param {number} direction - 1 for next, -1 for previous
      */
@@ -429,11 +456,40 @@ Keyboard Shortcuts:
             };
         }
 
-        // Get the text content for processing (this will strip HTML)
-        const textContent = this.editor.textContent || this.editor.innerText || '';
+        // Get the text content for processing - convert HTML line breaks to \n first
+        let htmlContent = this.editor.innerHTML;
+        
+        // Convert <br> and <div> tags to newlines before getting text content
+        // Create a temp element to safely process HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        
+        // Replace <br> tags with newlines
+        tempDiv.querySelectorAll('br').forEach(br => {
+            br.replaceWith('\n');
+        });
+        
+        // Convert <div> containers to newline-separated text
+        const textContent = Array.from(tempDiv.childNodes)
+            .map(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    return node.textContent;
+                } else if (node.nodeName === 'DIV') {
+                    return '\n' + node.textContent;
+                } else {
+                    return node.textContent;
+                }
+            })
+            .join('')
+            .trim();
+        
+        // DEBUG: Log to see what we're getting
+        console.log('formatChords - textContent:', JSON.stringify(textContent));
+        console.log('formatChords - innerHTML before:', this.editor.innerHTML);
+        console.log('formatChords - newline count:', (textContent.match(/\n/g) || []).length);
         
         // Fixed chord regex that properly handles # and b accidentals and Major7 variations
-        const chordRegex = /(?:^|[\s,])([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
+        const chordRegex = /(?:^|[ ,])([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[ ,]|$)/g;
         
         // First, extract existing chord spans and preserve their original chord data
         const existingChords = new Map();
@@ -443,14 +499,27 @@ Keyboard Shortcuts:
             return match;
         });
         
-        // Apply chord formatting to the plain text content
-        const formattedHTML = textContent.replace(chordRegex, (match, chord) => {
-            // Preserve the spacing around the chord
-            const prefix = match.match(/^[\s,]*/)[0];
-            // Use preserved original chord or current chord for new spans
-            const originalChord = existingChords.get(chord) || chord;
-            return `${prefix}<span class="chord" data-original-chord="${originalChord}">${chord}</span>`;
-        });
+        // Apply chord formatting to the plain text content, preserving newlines
+        const lines = textContent.split('\n');
+        const formattedHTML = lines
+            .map(line => {
+                // Handle empty lines - they need &nbsp; or <br> to maintain height
+                if (line.trim() === '') {
+                    return '&nbsp;';
+                }
+                return line.replace(chordRegex, (match, chord) => {
+                    // Preserve the spacing around the chord
+                    const prefix = match.match(/^[ ,]*/)[0];
+                    // Use preserved original chord or current chord for new spans
+                    const originalChord = existingChords.get(chord) || chord;
+                    return `${prefix}<span class="chord" data-original-chord="${originalChord}">${chord}</span>`;
+                });
+            })
+            .join('<br>');
+
+        // DEBUG: Log the result
+        console.log('formatChords - formattedHTML:', formattedHTML);
+        console.log('formatChords - lines array:', lines);
 
         // Only update if content actually changed
         if (originalHTML !== formattedHTML) {
@@ -458,6 +527,9 @@ Keyboard Shortcuts:
             
             // Restore cursor position after DOM update
             this.restoreCursorPosition(selectionInfo, selection);
+            
+            // Ensure cursor is not inside a chord span (prevents typing from being formatted as chord)
+            this.ensureCursorOutsideChordSpan();
         }
     }
     
@@ -627,6 +699,9 @@ Keyboard Shortcuts:
             this.updateFloatingResults(lines);
             this.updateDetailsResults(results);
             
+            // Highlight out-of-key chords
+            this.highlightOutOfKeyChords(results);
+            
             // Update chord click handlers for audio preview
             this.updateChordClickHandlers();
             
@@ -655,6 +730,37 @@ Keyboard Shortcuts:
             // Always record performance metrics
             this.endPerformanceTiming(startTime);
         }
+    }
+
+    /**
+     * Highlight chords that don't match the current top scale
+     */
+    highlightOutOfKeyChords(results) {
+        // Need a valid scale to compare against
+        if (!results || !results.scales || results.scales.length === 0) {
+            return;
+        }
+        
+        const topScale = results.scales[0];
+        const scaleChordsSet = new Set(
+            topScale.fullScaleChords.map(item => item.chord)
+        );
+        
+        // Find all chord spans in the editor
+        const chordSpans = this.editor.querySelectorAll('span.chord');
+        
+        chordSpans.forEach(span => {
+            const chordText = span.getAttribute('data-original-chord') || span.textContent;
+            
+            // Check if this chord is in the scale
+            if (scaleChordsSet.has(chordText)) {
+                // In key - remove the out-of-key class if present
+                span.classList.remove('out-of-key');
+            } else {
+                // Out of key - add the class
+                span.classList.add('out-of-key');
+            }
+        });
     }
 
     /**
@@ -751,6 +857,27 @@ Keyboard Shortcuts:
         
         let html = '';
         
+        // Add top scale match first (the chosen harmonic series)
+        if (results.scales.length > 0) {
+            const topMatch = results.scales[0];
+            const keyChordsWithPlacement = topMatch.fullScaleChords
+                .map(p => `<strong>${p.chord}</strong> (${p.placement || '?'})`)
+                .join(' - ');
+            
+            const suggestions = topMatch.suggestions.length > 0
+                ? `<br><span class="suggestion">Suggestions: ${topMatch.suggestions.join(', ')}</span>`
+                : '';
+            
+            html += `<div class="detail-item" style="border-left: 4px solid var(--color-primary);">
+                <div class="detailhead">
+                    ${topMatch.key} 
+                    <span class="score">Score: ${topMatch.score.toFixed(1)}</span>
+                </div>
+                <div><strong>Chords in key:</strong> ${keyChordsWithPlacement}</div>
+                ${suggestions}
+            </div>`;
+        }
+        
         // Add progression matches
         if (results.progressions.length > 0) {
             html += '<div class="detailhead">Similar Progressions</div>';
@@ -772,9 +899,10 @@ Keyboard Shortcuts:
             html += '</div><br>';
         }
         
-        // Add scale matches
-        if (results.scales.length > 0) {
-            results.scales.slice(0, 8).forEach(match => {
+        // Add remaining scale matches (lower ranking)
+        if (results.scales.length > 1) {
+            html += '<div class="detailhead">Other Possible Keys</div>';
+            results.scales.slice(1, 8).forEach(match => {
                 const keyChordsWithPlacement = match.fullScaleChords
                     .map(p => `<strong>${p.chord}</strong> (${p.placement || '?'})`)
                     .join(' - ');
