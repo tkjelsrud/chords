@@ -3,6 +3,8 @@
  * Handles all UI interactions, DOM manipulation, and visual updates
  */
 
+import { FretboardChordDetector } from './FretboardChordDetector.js';
+
 export class UIManager {
     constructor(chordAnalyzer, tabManager, analytics, audioSynth, chordPlayer) {
         this.chordAnalyzer = chordAnalyzer;
@@ -10,6 +12,7 @@ export class UIManager {
         this.analytics = analytics;
         this.audioSynth = audioSynth;
         this.chordPlayer = chordPlayer;
+        this.fretboardDetector = new FretboardChordDetector();
         this.eventListeners = new Map();
         
         // DOM elements
@@ -459,6 +462,9 @@ Keyboard Shortcuts:
         // Get the text content for processing - convert HTML line breaks to \n first
         let htmlContent = this.editor.innerHTML;
         
+        // Remove chord-hint spans to prevent duplication
+        htmlContent = htmlContent.replace(/<span class="chord-hint">[^<]*<\/span>/g, '');
+        
         // Convert <br> and <div> tags to newlines before getting text content
         // Create a temp element to safely process HTML
         const tempDiv = document.createElement('div');
@@ -491,11 +497,19 @@ Keyboard Shortcuts:
         // Fixed chord regex that properly handles # and b accidentals and Major7 variations
         const chordRegex = /(?:^|[ ,])([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[ ,]|$)/g;
         
+        // Fretboard notation regex
+        const fretboardRegex = /(?:^|[ ,])([x0-9]{3,6}|[x0-9](?:-[x0-9]+){2,5})(?=[ ,]|$)/g;
+        
         // First, extract existing chord spans and preserve their original chord data
         const existingChords = new Map();
+        const existingFretboards = new Map();
         const originalHTML = this.editor.innerHTML;
-        originalHTML.replace(/<span class="chord"[^>]*data-original-chord="([^"]*)"[^>]*>([^<]+)<\/span>/g, (match, originalChord, currentText) => {
-            existingChords.set(currentText, originalChord);
+        originalHTML.replace(/<span class="chord(?:\s+fretboard)?"[^>]*data-original-chord="([^"]*)"[^>]*>([^<]+)(?:<[^>]*>[^<]*<\/[^>]*>)?<\/span>/g, (match, originalChord, currentText) => {
+            if (match.includes('fretboard')) {
+                existingFretboards.set(originalChord, originalChord);
+            } else {
+                existingChords.set(currentText, originalChord);
+            }
             return match;
         });
         
@@ -507,13 +521,29 @@ Keyboard Shortcuts:
                 if (line.trim() === '') {
                     return '&nbsp;';
                 }
-                return line.replace(chordRegex, (match, chord) => {
-                    // Preserve the spacing around the chord
+                
+                // Format fretboard notations first
+                let formatted = line.replace(fretboardRegex, (match, notation) => {
                     const prefix = match.match(/^[ ,]*/)[0];
-                    // Use preserved original chord or current chord for new spans
+                    // Check if this notation was already formatted (use stored original)
+                    const originalNotation = existingFretboards.get(notation) || notation;
+                    const result = this.fretboardDetector.detectChord(originalNotation);
+                    const detectedChord = result && result.chord ? result.chord : '?';
+                    // Show fretboard notation with detected chord in parentheses
+                    return `${prefix}<span class="chord fretboard" data-original-chord="${originalNotation}">${originalNotation} <span class="chord-hint">(${detectedChord})</span></span>`;
+                });
+                
+                // Then format regular chord names
+                formatted = formatted.replace(chordRegex, (match, chord) => {
+                    // Skip if already wrapped (from fretboard formatting)
+                    if (match.includes('<span')) return match;
+                    
+                    const prefix = match.match(/^[ ,]*/)[0];
                     const originalChord = existingChords.get(chord) || chord;
                     return `${prefix}<span class="chord" data-original-chord="${originalChord}">${chord}</span>`;
                 });
+                
+                return formatted;
             })
             .join('<br>');
 
@@ -645,6 +675,38 @@ Keyboard Shortcuts:
     }
 
     /**
+     * Get the current passage (paragraph) where the cursor is located
+     * Passages are separated by blank lines (double newlines)
+     */
+    getCurrentPassage() {
+        const content = this.editor.innerText || '';
+        const selection = window.getSelection();
+        
+        if (!selection.rangeCount) {
+            return { passage: content, index: 0 };
+        }
+        
+        // Get cursor position in text
+        const range = selection.getRangeAt(0);
+        const cursorOffset = this.getTextOffset(range.startContainer, range.startOffset);
+        
+        // Split content into passages (separated by blank lines)
+        const passages = content.split(/\n\s*\n/);
+        
+        // Find which passage contains the cursor
+        let cumulativeOffset = 0;
+        for (let i = 0; i < passages.length; i++) {
+            const passageEnd = cumulativeOffset + passages[i].length;
+            if (cursorOffset <= passageEnd || i === passages.length - 1) {
+                return { passage: passages[i].trim(), index: i };
+            }
+            cumulativeOffset = passageEnd + 2; // +2 for the \n\n separator
+        }
+        
+        return { passage: passages[0].trim(), index: 0 };
+    }
+
+    /**
      * Analyze current editor content with error handling and performance monitoring
      */
     analyzeCurrentContent() {
@@ -653,17 +715,22 @@ Keyboard Shortcuts:
         try {
             const content = this.editor.innerText.trim();
             
-            if (content === this.lastAnalyzedText || content === '') {
-                if (content === '') {
-                    this.clearResults();
-                }
+            if (content === '') {
+                this.clearResults();
                 return;
             }
             
-            this.lastAnalyzedText = content;
+            // Get the current passage (where cursor is)
+            const { passage, index } = this.getCurrentPassage();
             
-            // Extract chords from content
-            const lines = content.split('\n').filter(line => line.trim() !== '');
+            if (passage === this.lastAnalyzedText) {
+                return; // No change in current passage
+            }
+            
+            this.lastAnalyzedText = passage;
+            
+            // Extract chords from current passage only
+            const lines = passage.split('\n').filter(line => line.trim() !== '');
             const allChords = [];
             
             lines.forEach(line => {
@@ -686,8 +753,11 @@ Keyboard Shortcuts:
                 return;
             }
             
-            // Analyze chords
+            // Analyze chords from current passage
             const results = this.chordAnalyzer.analyzeChords(allChords);
+            
+            // Store passage index for highlighting
+            this.currentPassageIndex = index;
             
             // Check for analysis errors
             if (results.errors && results.errors.length > 0) {
@@ -699,7 +769,7 @@ Keyboard Shortcuts:
             this.updateFloatingResults(lines);
             this.updateDetailsResults(results);
             
-            // Highlight out-of-key chords
+            // Highlight out-of-key chords (only in current passage)
             this.highlightOutOfKeyChords(results);
             
             // Update chord click handlers for audio preview
@@ -734,6 +804,7 @@ Keyboard Shortcuts:
 
     /**
      * Highlight chords that don't match the current top scale
+     * Only highlights chords in the current passage
      */
     highlightOutOfKeyChords(results) {
         // Need a valid scale to compare against
@@ -746,21 +817,73 @@ Keyboard Shortcuts:
             topScale.fullScaleChords.map(item => item.chord)
         );
         
+        // Get current passage bounds
+        const content = this.editor.innerText || '';
+        const passages = content.split(/\n\s*\n/);
+        const currentPassage = passages[this.currentPassageIndex || 0];
+        
         // Find all chord spans in the editor
         const chordSpans = this.editor.querySelectorAll('span.chord');
+        
+        // Calculate which spans belong to current passage
+        let textOffset = 0;
+        let passageStartOffset = 0;
+        let passageEndOffset = 0;
+        
+        for (let i = 0; i < passages.length; i++) {
+            if (i === this.currentPassageIndex) {
+                passageStartOffset = textOffset;
+                passageEndOffset = textOffset + passages[i].length;
+                break;
+            }
+            textOffset += passages[i].length + 2; // +2 for \n\n
+        }
         
         chordSpans.forEach(span => {
             const chordText = span.getAttribute('data-original-chord') || span.textContent;
             
-            // Check if this chord is in the scale
-            if (scaleChordsSet.has(chordText)) {
-                // In key - remove the out-of-key class if present
-                span.classList.remove('out-of-key');
+            // Get the position of this chord span in the document
+            const spanOffset = this.getSpanTextOffset(span);
+            
+            // Only apply highlighting if chord is in current passage
+            if (spanOffset >= passageStartOffset && spanOffset <= passageEndOffset) {
+                // Check if this chord is in the scale
+                if (scaleChordsSet.has(chordText)) {
+                    span.classList.remove('out-of-key');
+                } else {
+                    span.classList.add('out-of-key');
+                }
             } else {
-                // Out of key - add the class
-                span.classList.add('out-of-key');
+                // Remove highlighting from chords in other passages
+                span.classList.remove('out-of-key');
             }
         });
+    }
+    
+    /**
+     * Get text offset of a span element within the editor
+     */
+    getSpanTextOffset(span) {
+        const walker = document.createTreeWalker(
+            this.editor,
+            NodeFilter.SHOW_ALL,
+            null,
+            false
+        );
+        
+        let offset = 0;
+        let node;
+        
+        while (node = walker.nextNode()) {
+            if (node === span) {
+                return offset;
+            }
+            if (node.nodeType === Node.TEXT_NODE) {
+                offset += node.textContent.length;
+            }
+        }
+        
+        return offset;
     }
 
     /**
@@ -786,8 +909,22 @@ Keyboard Shortcuts:
         }
         
         // For plain text, use regex extraction
-        const chordRegex = /(?:^|[\s,]|^)([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
         const matches = [];
+        
+        // First, check for fretboard notation (e.g., x32010, x-7-8-7, 7x78)
+        const fretboardRegex = /(?:^|[\s,])([x0-9]{3,6}|[x0-9](?:-[x0-9]+){2,5})(?=[\s,]|$)/gi;
+        let fretMatch;
+        
+        while ((fretMatch = fretboardRegex.exec(line)) !== null) {
+            const notation = fretMatch[1].trim();
+            const result = this.fretboardDetector.detectChord(notation);
+            if (result && result.chord && !matches.includes(result.chord)) {
+                matches.push(result.chord);
+            }
+        }
+        
+        // Then extract standard chord names
+        const chordRegex = /(?:^|[\s,]|^)([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[\s,]|$)/g;
         let match;
         
         while ((match = chordRegex.exec(line)) !== null) {

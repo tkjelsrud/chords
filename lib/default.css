@@ -189,6 +189,20 @@ header {
     color: white;
 }
 
+/* Fretboard notation chords - slightly different style */
+.chord.fretboard {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    border-bottom: 2px dotted var(--color-primary);
+}
+
+.chord.fretboard .chord-hint {
+    font-family: var(--font-family-main);
+    font-size: 0.85em;
+    opacity: 0.7;
+    font-weight: normal;
+}
+
 /* Chords that don't match the current scale */
 .chord.out-of-key {
     color: #e76f51;
