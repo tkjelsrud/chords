@@ -12,6 +12,24 @@ A modern, responsive web application for analyzing musical chord progressions an
 - **Error Resilience** - Graceful handling of network issues and invalid inputs
 - **Performance Optimized** - Debounced input, efficient DOM updates, and performance monitoring
 
+### 🎸 Pure HTML Chord Notation
+
+A simple, standalone system for displaying songs with color-coded chords using custom HTML elements:
+
+```html
+<song>
+    <h3>My Song</h3>
+    <song-meta>Key: Am | Tempo: 120</song-meta>
+    <chord>Am</chord> <chord>F</chord> <chord>C</chord> <chord>G</chord>
+</song>
+```
+
+- **Color-coded**: Each root note (C, D, E...) has a unique Riso-inspired color
+- **Interactive**: Click chords to see guitar fingerings (powered by VexChords)
+- **Special notations**: `<chord alt>` (alternative), `<chord up>` (octave up), `<sep>` (separator)
+- **Zero configuration**: Just write chord names, JS auto-parses everything
+- See [demo.html](demo.html) for complete examples and [template.html](template.html) to start
+
 ## 🚀 Getting Started
 
 ### Live Demo

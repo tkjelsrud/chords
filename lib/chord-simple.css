@@ -1,0 +1,546 @@
+/**
+ * Pure HTML Chord Display
+ * Enkel CSS som automatisk farger <chord> elementer basert på innhold
+ * Inspirert av Riso-farger
+ */
+
+:root {
+    /* Riso-inspirerte farger */
+    --riso-red: #ff4848;
+    --riso-orange: #ff6c2f;
+    --riso-yellow: #ffe800;
+    --riso-lime: #d8e700;
+    --riso-green: #00a95c;
+    --riso-teal: #00838a;
+    --riso-aqua: #0097b4;
+    --riso-blue: #0078bf;
+    --riso-violet: #765ba7;
+    --riso-purple: #765ba7;
+    --riso-burgundy: #914e72;
+    --riso-pink: #ff48b0;
+}
+
+/* Base styling */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #fafafa;
+    color: #333;
+    padding: 12px;
+    line-height: 1.4;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Song container */
+song {
+    display: block;
+    background: transparent;
+    border-radius: 0;
+    padding: 8px 0;
+    margin-bottom: 16px;
+    box-shadow: none;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+song h1, song h2, song h3 {
+    margin: 0 0 8px 0;
+    color: #222;
+}
+
+song h2 {
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 6px;
+}
+
+song h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+song-meta {
+    display: block;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+song-meta span {
+    margin-right: 12px;
+}
+
+song p {
+    margin: 4px 0;
+    color: #888;
+    font-size: 12px;
+}
+
+/* Song sections (h3) */
+.song h3 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+}
+
+/* Song notes - generelle notater */
+.song-note {
+    margin-top: 16px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Section hints - små notater til sections */
+.section-hint {
+    margin: 4px 0;
+    color: #888;
+    font-size: 12px;
+}
+
+/* Continuation hints - notater som leder videre */
+.continuation-hint {
+    margin: 8px 0 4px 0;
+    color: #888;
+    font-size: 12px;
+}
+
+/* Chord element - hovedstyling */
+chord {
+    display: inline-block;
+    position: relative;
+    min-width: 70px;
+    height: 42px;
+    padding: 4px 6px;
+    margin: 2px 1px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #000;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+    line-height: 32px;
+    vertical-align: top;
+    padding-bottom: 8px;
+}
+
+chord:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+/* Fargebånd i bunnen av akkord-boksen */
+chord::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #999;
+    border-radius: 0 0 3px 3px;
+}
+
+/* Metadata som data-attributter vises som pseudo-element */
+chord[data-voicing]::after,
+chord[data-fret]::after {
+    content: attr(data-voicing) " " attr(data-fret);
+    display: block;
+    font-size: 8px;
+    font-weight: 500;
+    margin-top: -8px;
+    line-height: 1;
+    color: #777;
+    position: relative;
+    z-index: 1;
+}
+
+chord[data-fret]:not([data-voicing])::after {
+    content: attr(data-fret) "fr";
+}
+
+chord[data-voicing]:not([data-fret])::after {
+    content: attr(data-voicing);
+}
+
+/* === FARGEKODING BASERT PÅ AKKORDNAVN === */
+
+/* C-akkorder (Red) */
+chord[data-chord="C"], chord[data-chord="C7"], chord[data-chord="Cmaj7"], 
+chord[data-chord="C9"], chord[data-chord="Cadd9"], chord[data-chord="Csus4"] {
+}
+
+chord[data-chord="C"]::before, chord[data-chord="C7"]::before, chord[data-chord="Cmaj7"]::before,
+chord[data-chord="C9"]::before, chord[data-chord="Cadd9"]::before, chord[data-chord="Csus4"]::before {
+    background: var(--riso-red);
+}
+
+chord[data-chord="Cm"], chord[data-chord="Cm7"], chord[data-chord="Cmin"], 
+chord[data-chord="Cmin7"], chord[data-chord="Cdim"] {
+}
+
+chord[data-chord="Cm"]::before, chord[data-chord="Cm7"]::before, chord[data-chord="Cmin"]::before,
+chord[data-chord="Cmin7"]::before, chord[data-chord="Cdim"]::before {
+    background: var(--riso-red);
+    height: 5px;
+}
+
+/* Moll-akkorder får svak rødlig bakgrunn */
+chord[data-chord="Cm"], chord[data-chord="Cm7"], chord[data-chord="Cmin"], 
+chord[data-chord="Cmin7"] {
+    background: #fff5f5;
+}
+
+/* D-akkorder (Yellow) */
+chord[data-chord="D"], chord[data-chord="D7"], chord[data-chord="Dmaj7"],
+chord[data-chord="D9"], chord[data-chord="Dadd9"], chord[data-chord="Dsus4"] {
+}
+
+chord[data-chord="D"]::before, chord[data-chord="D7"]::before, chord[data-chord="Dmaj7"]::before,
+chord[data-chord="D9"]::before, chord[data-chord="Dadd9"]::before, chord[data-chord="Dsus4"]::before {
+    background: var(--riso-yellow);
+}
+
+chord[data-chord="Dm"], chord[data-chord="Dm7"], chord[data-chord="Dmin"],
+chord[data-chord="Dmin7"], chord[data-chord="Ddim"] {
+}
+
+chord[data-chord="Dm"]::before, chord[data-chord="Dm7"]::before, chord[data-chord="Dmin"]::before,
+chord[data-chord="Dmin7"]::before, chord[data-chord="Ddim"]::before {
+    background: var(--riso-yellow);
+    height: 5px;
+}
+
+/* Db/C# akkorder (Orange) */
+chord[data-chord="Db"], chord[data-chord="C#"], chord[data-chord="Db7"], 
+chord[data-chord="C#7"], chord[data-chord="Dbmaj7"], chord[data-chord="C#maj7"] {
+}
+
+chord[data-chord="Db"]::before, chord[data-chord="C#"]::before, chord[data-chord="Db7"]::before,
+chord[data-chord="C#7"]::before, chord[data-chord="Dbmaj7"]::before, chord[data-chord="C#maj7"]::before {
+    background: var(--riso-orange);
+}
+
+chord[data-chord="Dbm"], chord[data-chord="C#m"], chord[data-chord="Dbm7"],
+chord[data-chord="C#m7"] {
+}
+
+chord[data-chord="Dbm"]::before, chord[data-chord="C#m"]::before, chord[data-chord="Dbm7"]::before,
+chord[data-chord="C#m7"]::before {
+    background: var(--riso-orange);
+    height: 5px;
+}
+
+/* Eb/D# akkorder (Lime) */
+chord[data-chord="Eb"], chord[data-chord="D#"], chord[data-chord="Eb7"],
+chord[data-chord="D#7"], chord[data-chord="Ebmaj7"] {
+}
+
+chord[data-chord="Eb"]::before, chord[data-chord="D#"]::before, chord[data-chord="Eb7"]::before,
+chord[data-chord="D#7"]::before, chord[data-chord="Ebmaj7"]::before {
+    background: var(--riso-lime);
+}
+
+chord[data-chord="Ebm"], chord[data-chord="D#m"], chord[data-chord="Ebm7"],
+chord[data-chord="D#m7"] {
+}
+
+chord[data-chord="Ebm"]::before, chord[data-chord="D#m"]::before, chord[data-chord="Ebm7"]::before,
+chord[data-chord="D#m7"]::before {
+    background: var(--riso-lime);
+    height: 5px;
+}
+
+/* E-akkorder (Green) */
+chord[data-chord="E"], chord[data-chord="E7"], chord[data-chord="Emaj7"],
+chord[data-chord="E9"], chord[data-chord="Esus4"] {
+}
+
+chord[data-chord="E"]::before, chord[data-chord="E7"]::before, chord[data-chord="Emaj7"]::before,
+chord[data-chord="E9"]::before, chord[data-chord="Esus4"]::before {
+    background: var(--riso-green);
+}
+
+chord[data-chord="Em"], chord[data-chord="Em7"], chord[data-chord="Emin"],
+chord[data-chord="Emin7"], chord[data-chord="Edim"] {
+}
+
+chord[data-chord="Em"]::before, chord[data-chord="Em7"]::before, chord[data-chord="Emin"]::before,
+chord[data-chord="Emin7"]::before, chord[data-chord="Edim"]::before {
+    background: var(--riso-green);
+    height: 5px;
+}
+
+/* F-akkorder (Teal) */
+chord[data-chord="F"], chord[data-chord="F7"], chord[data-chord="Fmaj7"],
+chord[data-chord="F9"], chord[data-chord="Fsus4"] {
+}
+
+chord[data-chord="F"]::before, chord[data-chord="F7"]::before, chord[data-chord="Fmaj7"]::before,
+chord[data-chord="F9"]::before, chord[data-chord="Fsus4"]::before {
+    background: var(--riso-teal);
+}
+
+chord[data-chord="Fm"], chord[data-chord="Fm7"], chord[data-chord="Fmin"],
+chord[data-chord="Fmin7"], chord[data-chord="Fdim"] {
+}
+
+chord[data-chord="Fm"]::before, chord[data-chord="Fm7"]::before, chord[data-chord="Fmin"]::before,
+chord[data-chord="Fmin7"]::before, chord[data-chord="Fdim"]::before {
+    background: var(--riso-teal);
+    height: 5px;
+}
+
+/* Gb/F# akkorder (Aqua) */
+chord[data-chord="Gb"], chord[data-chord="F#"], chord[data-chord="Gb7"],
+chord[data-chord="F#7"], chord[data-chord="Gbmaj7"], chord[data-chord="F#maj7"] {
+}
+
+chord[data-chord="Gb"]::before, chord[data-chord="F#"]::before, chord[data-chord="Gb7"]::before,
+chord[data-chord="F#7"]::before, chord[data-chord="Gbmaj7"]::before, chord[data-chord="F#maj7"]::before {
+    background: var(--riso-aqua);
+}
+
+chord[data-chord="Gbm"], chord[data-chord="F#m"], chord[data-chord="Gbm7"],
+chord[data-chord="F#m7"] {
+}
+
+chord[data-chord="Gbm"]::before, chord[data-chord="F#m"]::before, chord[data-chord="Gbm7"]::before,
+chord[data-chord="F#m7"]::before {
+    background: var(--riso-aqua);
+    height: 5px;
+}
+
+/* G-akkorder (Blue) */
+chord[data-chord="G"], chord[data-chord="G7"], chord[data-chord="Gmaj7"],
+chord[data-chord="G9"], chord[data-chord="Gsus4"] {
+}
+
+chord[data-chord="G"]::before, chord[data-chord="G7"]::before, chord[data-chord="Gmaj7"]::before,
+chord[data-chord="G9"]::before, chord[data-chord="Gsus4"]::before {
+    background: var(--riso-blue);
+}
+
+chord[data-chord="Gm"], chord[data-chord="Gm7"], chord[data-chord="Gmin"],
+chord[data-chord="Gmin7"], chord[data-chord="Gdim"] {
+}
+
+chord[data-chord="Gm"]::before, chord[data-chord="Gm7"]::before, chord[data-chord="Gmin"]::before,
+chord[data-chord="Gmin7"]::before, chord[data-chord="Gdim"]::before {
+    background: var(--riso-blue);
+    height: 5px;
+}
+
+/* Ab/G# akkorder (Violet) */
+chord[data-chord="Ab"], chord[data-chord="G#"], chord[data-chord="Ab7"],
+chord[data-chord="G#7"], chord[data-chord="Abmaj7"] {
+}
+
+chord[data-chord="Ab"]::before, chord[data-chord="G#"]::before, chord[data-chord="Ab7"]::before,
+chord[data-chord="G#7"]::before, chord[data-chord="Abmaj7"]::before {
+    background: var(--riso-violet);
+}
+
+chord[data-chord="Abm"], chord[data-chord="G#m"], chord[data-chord="Abm7"],
+chord[data-chord="G#m7"] {
+}
+
+chord[data-chord="Abm"]::before, chord[data-chord="G#m"]::before, chord[data-chord="Abm7"]::before,
+chord[data-chord="G#m7"]::before {
+    background: var(--riso-violet);
+    height: 5px;
+}
+
+/* A-akkorder (Purple) */
+chord[data-chord="A"], chord[data-chord="A7"], chord[data-chord="Amaj7"],
+chord[data-chord="A9"], chord[data-chord="Asus4"] {
+}
+
+chord[data-chord="A"]::before, chord[data-chord="A7"]::before, chord[data-chord="Amaj7"]::before,
+chord[data-chord="A9"]::before, chord[data-chord="Asus4"]::before {
+    background: var(--riso-purple);
+}
+
+chord[data-chord="Am"], chord[data-chord="Am7"], chord[data-chord="Amin"],
+chord[data-chord="Amin7"], chord[data-chord="Adim"] {
+}
+
+chord[data-chord="Am"]::before, chord[data-chord="Am7"]::before, chord[data-chord="Amin"]::before,
+chord[data-chord="Amin7"]::before, chord[data-chord="Adim"]::before {
+    background: var(--riso-purple);
+    height: 5px;
+}
+
+/* Bb/A# akkorder (Burgundy) */
+chord[data-chord="Bb"], chord[data-chord="A#"], chord[data-chord="Bb7"],
+chord[data-chord="A#7"], chord[data-chord="Bbmaj7"] {
+}
+
+chord[data-chord="Bb"]::before, chord[data-chord="A#"]::before, chord[data-chord="Bb7"]::before,
+chord[data-chord="A#7"]::before, chord[data-chord="Bbmaj7"]::before {
+    background: var(--riso-burgundy);
+}
+
+chord[data-chord="Bbm"], chord[data-chord="A#m"], chord[data-chord="Bbm7"],
+chord[data-chord="A#m7"] {
+}
+
+chord[data-chord="Bbm"]::before, chord[data-chord="A#m"]::before, chord[data-chord="Bbm7"]::before,
+chord[data-chord="A#m7"]::before {
+    background: var(--riso-burgundy);
+    height: 5px;
+}
+
+/* B-akkorder (Pink) */
+chord[data-chord="B"], chord[data-chord="B7"], chord[data-chord="Bmaj7"],
+chord[data-chord="B9"], chord[data-chord="Bsus4"] {
+}
+
+chord[data-chord="B"]::before, chord[data-chord="B7"]::before, chord[data-chord="Bmaj7"]::before,
+chord[data-chord="B9"]::before, chord[data-chord="Bsus4"]::before {
+    background: var(--riso-pink);
+}
+
+chord[data-chord="Bm"], chord[data-chord="Bm7"], chord[data-chord="Bmin"],
+chord[data-chord="Bmin7"], chord[data-chord="Bdim"] {
+}
+
+chord[data-chord="Bm"]::before, chord[data-chord="Bm7"]::before, chord[data-chord="Bmin"]::before,
+chord[data-chord="Bmin7"]::before, chord[data-chord="Bdim"]::before {
+    background: var(--riso-pink);
+    height: 5px;
+}
+
+/* Fallback - hvis ingen data-chord er satt, prøv å parse innholdet */
+chord:not([data-chord]) {
+}
+
+chord:not([data-chord])::before {
+    background: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    chord {
+        min-width: 60px;
+        height: 38px;
+        font-size: 14px;
+        line-height: 28px;
+        border-width: 3px;
+    }
+    
+    .song h2 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    chord {
+        min-width: 52px;
+        height: 34px;
+        font-size: 13px;
+        line-height: 24px;
+        margin: 1px;
+        border-width: 2px;
+    }
+    
+    .song h2 {
+        font-size: 15px;
+    }
+    
+    .song-meta {
+        font-size: 10px;
+    }
+}
+
+/* Print */
+@media print {
+    body {
+        background: white;
+        padding: 8px;
+    }
+    
+    song {
+        page-break-inside: avoid;
+        box-shadow: none;
+        margin-bottom: 12px;
+        padding: 4px 0;
+    }
+    
+    song h2 {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    
+    song-meta {
+        font-size: 9px;
+        margin-bottom: 4px;
+    }
+    
+    chord {
+        box-shadow: none;
+        height: 36px;
+        min-width: 60px;
+        font-size: 13px;
+        line-height: 28px;
+        margin: 1px;
+    }
+}
+
+/* Alle moll-akkorder får svak rødlig bakgrunn */
+chord[data-chord$="m"], chord[data-chord$="m7"], 
+chord[data-chord*="min"] {
+    background: #fff5f5;
+}
+
+/* Unntatt akkorder som slutter på m men ikke er moll (som F#m osv - disse håndteres over) */
+chord[data-chord$="maj"], chord[data-chord$="maj7"] {
+    background: white;
+}
+
+/* Alternative chords - shown with parentheses */
+
+/* Alternative chords - dashed border */
+chord[alt] {
+    border-style: dashed;
+}
+
+/* Chord separator - diagonal slash */
+sep {
+    display: inline-block;
+    width: 8px;
+    height: 42px;
+    line-height: 42px;
+    text-align: center;
+    color: #ccc;
+    font-size: 20px;
+    margin: 0 -2px;
+    vertical-align: top;
+}
+
+sep::before {
+    content: '/';
+}
+
+/* Octave up indicator */
+
+/* Octave up indicator */
+chord[up]::after {
+    content: '↑';
+    position: absolute;
+    bottom: 6px;
+    right: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    z-index: 10;
+}

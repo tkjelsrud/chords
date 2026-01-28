@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chord Notation Demo</title>
+    
+    <!-- Import CSS -->
+    <link rel="stylesheet" href="lib/chord-simple.css">
+    <link rel="stylesheet" href="lib/chord-modal.css">
+</head>
+<body>
+
+    <div style="max-width: 1000px; margin: 0 auto; padding: 20px;">
+        <h1 style="margin-bottom: 8px;">🎸 Chord Notation System</h1>
+        <p style="color: #666; margin-bottom: 32px;">
+            Minimal HTML markup for musical chord notation with colored visual coding (riso-colors).
+            Click any chord to see guitar fingering diagram.
+        </p>
+
+        <div style="background: #f5f5f5; padding: 16px; border-radius: 8px; margin-bottom: 32px;">
+            <h3 style="margin-top: 0;">Features</h3>
+            <ul style="line-height: 1.8; color: #555;">
+                <li><strong>Color-coded chords:</strong> Each root note gets unique color (C=red, D=yellow, E=green, etc.)</li>
+                <li><strong>Minor chord distinction:</strong> Subtle red tint background + thicker color band</li>
+                <li><strong>Interactive diagrams:</strong> Click chords to see guitar fingering positions</li>
+                <li><strong>Alternative chords:</strong> Use <code>alt</code> attribute for dashed border</li>
+                <li><strong>Octave indicators:</strong> Use <code>up</code> attribute to show octave up (↑)</li>
+                <li><strong>Separators:</strong> Use <code>&lt;sep&gt;</code> for visual breaks between chord groups</li>
+                <li><strong>Compact printing:</strong> Optimized layout for cheat sheets</li>
+            </ul>
+        </div>
+
+        <h2 style="border-bottom: 2px solid #ddd; padding-bottom: 8px; margin-bottom: 16px;">Example Songs</h2>
+    </div>
+
+    <song>
+        <h2>🌟 Demo Song</h2>
+        <song-meta>
+            <span>Toneart: Am</span>
+            <span>Tempo: 95 BPM</span>
+        </song-meta>
+        
+        <h3>Intro</h3>
+        <p>Simple progression with alternative ending</p>
+        <chord>Am</chord>
+        <chord>F</chord>
+        <chord>C</chord>
+        <chord>G</chord>
+        <chord alt>Em</chord>
+        
+        <h3>Verse</h3>
+        <p>Demonstrates octave up notation</p>
+        <chord>Am</chord>
+        <chord up>Am</chord>
+        <chord>Dm</chord>
+        <chord>G</chord>
+        
+        <h3>Chorus</h3>
+        <p>Using separators to group chord changes</p>
+        <chord>F</chord>
+        <chord>G</chord>
+        <sep></sep>
+        <chord>Am</chord>
+        <chord>C</chord>
+        <sep></sep>
+        <chord>F</chord>
+        <chord>G</chord>
+        <chord>C</chord>
+        
+        <h3>Bridge</h3>
+        <p>Minor chords have subtle red tint</p>
+        <chord>Dm</chord>
+        <chord>Em</chord>
+        <chord>Am</chord>
+        <chord>Bm7</chord>
+        
+        <h3>Jazz Section</h3>
+        <p>Major 7th and complex chords</p>
+        <chord>Cmaj7</chord>
+        <chord>Fmaj7</chord>
+        <chord>Dm7</chord>
+        <chord>G7</chord>
+    </song>
+
+    <song>
+        <h2>🎵 Blues Example</h2>
+        <song-meta>
+            <span>Toneart: E</span>
+            <span>Tempo: 120 BPM</span>
+        </song-meta>
+        
+        <h3>12-Bar Blues</h3>
+        <chord>E7</chord>
+        <chord>E7</chord>
+        <chord>E7</chord>
+        <chord>E7</chord>
+        <br>
+        <chord>A7</chord>
+        <chord>A7</chord>
+        <chord>E7</chord>
+        <chord>E7</chord>
+        <br>
+        <chord>B7</chord>
+        <chord>A7</chord>
+        <chord>E7</chord>
+        <chord>B7</chord>
+    </song>
+
+    <div style="max-width: 1000px; margin: 40px auto; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+        <h2 style="margin-top: 0;">Basic Usage</h2>
+        
+        <h3>HTML Structure</h3>
+        <pre style="background: white; padding: 12px; border-radius: 4px; overflow-x: auto;"><code>&lt;song&gt;
+    &lt;h2&gt;Song Title&lt;/h2&gt;
+    &lt;song-meta&gt;
+        &lt;span&gt;Toneart: Am&lt;/span&gt;
+        &lt;span&gt;Tempo: 120 BPM&lt;/span&gt;
+    &lt;/song-meta&gt;
+    
+    &lt;h3&gt;Section Name&lt;/h3&gt;
+    &lt;p&gt;Optional notes&lt;/p&gt;
+    &lt;chord&gt;Am&lt;/chord&gt;
+    &lt;chord&gt;F&lt;/chord&gt;
+    &lt;chord&gt;C&lt;/chord&gt;
+    &lt;chord&gt;G&lt;/chord&gt;
+&lt;/song&gt;</code></pre>
+
+        <h3>Special Attributes</h3>
+        <pre style="background: white; padding: 12px; border-radius: 4px; overflow-x: auto;"><code>&lt;!-- Alternative chord (dashed border) --&gt;
+&lt;chord alt&gt;Em&lt;/chord&gt;
+
+&lt;!-- Octave up indicator --&gt;
+&lt;chord up&gt;Am&lt;/chord&gt;
+
+&lt;!-- Separator slash --&gt;
+&lt;sep&gt;&lt;/sep&gt;
+
+&lt;!-- Specific voicing/fret (for metadata) --&gt;
+&lt;chord data-voicing="barre" data-fret="5"&gt;Dm&lt;/chord&gt;</code></pre>
+
+        <h3>Required Files</h3>
+        <ul style="line-height: 1.8;">
+            <li><code>lib/chord-simple.css</code> - Main stylesheet with riso-colors</li>
+            <li><code>lib/chord-modal.css</code> - Modal popup styles</li>
+            <li><code>lib/chord-simple.js</code> - Auto-parsing and interactivity</li>
+            <li><code>lib/chord-fingerings.js</code> - Guitar fingering database</li>
+            <li><code>old/vexchords.dev.js</code> - VexChords library for diagrams</li>
+        </ul>
+
+        <h3>Color Mapping (Chromatic Scale)</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 12px;">
+            <div style="padding: 8px; background: #ff4848; color: white; border-radius: 4px; text-align: center;">C - Red</div>
+            <div style="padding: 8px; background: #ff6c2f; color: white; border-radius: 4px; text-align: center;">C# - Orange</div>
+            <div style="padding: 8px; background: #ffe800; color: #333; border-radius: 4px; text-align: center;">D - Yellow</div>
+            <div style="padding: 8px; background: #d8e700; color: #333; border-radius: 4px; text-align: center;">D# - Lime</div>
+            <div style="padding: 8px; background: #00a95c; color: white; border-radius: 4px; text-align: center;">E - Green</div>
+            <div style="padding: 8px; background: #00838a; color: white; border-radius: 4px; text-align: center;">F - Teal</div>
+            <div style="padding: 8px; background: #0097b4; color: white; border-radius: 4px; text-align: center;">F# - Aqua</div>
+            <div style="padding: 8px; background: #0078bf; color: white; border-radius: 4px; text-align: center;">G - Blue</div>
+            <div style="padding: 8px; background: #765ba7; color: white; border-radius: 4px; text-align: center;">G# - Violet</div>
+            <div style="padding: 8px; background: #765ba7; color: white; border-radius: 4px; text-align: center;">A - Purple</div>
+            <div style="padding: 8px; background: #914e72; color: white; border-radius: 4px; text-align: center;">A# - Burgundy</div>
+            <div style="padding: 8px; background: #ff48b0; color: white; border-radius: 4px; text-align: center;">B - Pink</div>
+        </div>
+    </div>
+
+    <!-- Libraries for chord diagrams -->
+    <script src="old/vexchords.dev.js"></script>
+    <script src="lib/chord-fingerings.js"></script>
+    <script src="lib/chord-simple.js"></script>
+
+</body>
+</html>
