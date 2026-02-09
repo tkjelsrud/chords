@@ -189,6 +189,47 @@ header {
     color: white;
 }
 
+/* ===== Technique Icons (oct/shell) ===== */
+.chord[data-technique-icon] {
+    /* Inline icon sits next to the chord label; no extra padding needed. */
+}
+
+.chord[data-technique-icon]::after {
+    content: "";
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    opacity: 0.95;
+    pointer-events: none;
+    margin-left: 6px;
+    vertical-align: -4px;
+}
+
+.chord[data-technique-icon="oct_str1"]::after { background-image: url("icons/icn24_oct_str1.png"); }
+.chord[data-technique-icon="oct_str2"]::after { background-image: url("icons/icn24_oct_str2.png"); }
+.chord[data-technique-icon="shell_may_str1"]::after { background-image: url("icons/icn24_shell_may_str1.png"); }
+.chord[data-technique-icon="shell_may_str2"]::after { background-image: url("icons/icn24_shell_may_str2.png"); }
+.chord[data-technique-icon="shell_min_str1"]::after { background-image: url("icons/icn24_shell_min_str1.png"); }
+.chord[data-technique-icon="shell_min_str2"]::after { background-image: url("icons/icn24_shell_min_str2.png"); }
+
+.chord[data-technique-icon^="shell_may_"]::after { filter: drop-shadow(0 0 2px rgba(0, 110, 0, 0.35)); }
+.chord[data-technique-icon^="shell_min_"]::after { filter: drop-shadow(0 0 2px rgba(160, 0, 0, 0.35)); }
+
+.tech-directive {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.85em;
+    opacity: 0.65;
+    color: var(--color-text-secondary);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 1px 6px;
+    margin: 0 2px;
+    white-space: nowrap;
+}
+
 /* Fretboard notation chords - slightly different style */
 .chord.fretboard {
     font-family: 'Courier New', Courier, monospace;

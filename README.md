@@ -26,9 +26,9 @@ A simple, standalone system for displaying songs with color-coded chords using c
 
 - **Color-coded**: Each root note (C, D, E...) has a unique Riso-inspired color
 - **Interactive**: Click chords to see guitar fingerings (powered by VexChords)
-- **Special notations**: `<chord alt>` (alternative), `<chord up>` (octave up), `<sep>` (separator)
+- **Special notations**: `<chord alt>` (alternative), `<chord oct="1|2">` / `<chord shell="1|2">` (technique icons), `<chord up>` (legacy octave-up arrow), `<sep>` (separator)
 - **Zero configuration**: Just write chord names, JS auto-parses everything
-- See [demo.html](demo.html) for complete examples and [template.html](template.html) to start
+- See [demo.html](demo.html) for complete examples (it also works as a starter template)
 
 ## 🚀 Getting Started
 
@@ -250,4 +250,3 @@ Both chord recognition and cursor position should work smoothly now!
 ---
 
 Made with ❤️ for musicians and music lovers everywhere.
-

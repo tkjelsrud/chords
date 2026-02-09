@@ -494,12 +494,9 @@ Keyboard Shortcuts:
         console.log('formatChords - innerHTML before:', this.editor.innerHTML);
         console.log('formatChords - newline count:', (textContent.match(/\n/g) || []).length);
         
-        // Fixed chord regex that properly handles # and b accidentals and Major7 variations
-        const chordRegex = /(?:^|[ ,])([A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=[ ,]|$)/g;
-        
-        // Fretboard notation regex
-        const fretboardRegex = /(?:^|[ ,])([x0-9]{3,6}|[x0-9](?:-[x0-9]+){2,5})(?=[ ,]|$)/g;
-        
+        // NOTE: Chord parsing/formatting is kept delimiter-based (spaces/commas) for stability.
+        // We now also support technique directives like [oct:1], [shell:2], [tech:off].
+
         // First, extract existing chord spans and preserve their original chord data
         const existingChords = new Map();
         const existingFretboards = new Map();
@@ -515,35 +512,18 @@ Keyboard Shortcuts:
         
         // Apply chord formatting to the plain text content, preserving newlines
         const lines = textContent.split('\n');
+        const techniqueState = { type: null, str: null };
         const formattedHTML = lines
             .map(line => {
-                // Handle empty lines - they need &nbsp; or <br> to maintain height
+                // Handle empty lines - they need &nbsp; or <br> to maintain height.
+                // Also reset technique state at passage breaks.
                 if (line.trim() === '') {
+                    techniqueState.type = null;
+                    techniqueState.str = null;
                     return '&nbsp;';
                 }
-                
-                // Format fretboard notations first
-                let formatted = line.replace(fretboardRegex, (match, notation) => {
-                    const prefix = match.match(/^[ ,]*/)[0];
-                    // Check if this notation was already formatted (use stored original)
-                    const originalNotation = existingFretboards.get(notation) || notation;
-                    const result = this.fretboardDetector.detectChord(originalNotation);
-                    const detectedChord = result && result.chord ? result.chord : '?';
-                    // Show fretboard notation with detected chord in parentheses
-                    return `${prefix}<span class="chord fretboard" data-original-chord="${originalNotation}">${originalNotation} <span class="chord-hint">(${detectedChord})</span></span>`;
-                });
-                
-                // Then format regular chord names
-                formatted = formatted.replace(chordRegex, (match, chord) => {
-                    // Skip if already wrapped (from fretboard formatting)
-                    if (match.includes('<span')) return match;
-                    
-                    const prefix = match.match(/^[ ,]*/)[0];
-                    const originalChord = existingChords.get(chord) || chord;
-                    return `${prefix}<span class="chord" data-original-chord="${originalChord}">${chord}</span>`;
-                });
-                
-                return formatted;
+
+                return this.formatChordLineWithTechniques(line, existingChords, existingFretboards, techniqueState);
             })
             .join('<br>');
 
@@ -561,6 +541,98 @@ Keyboard Shortcuts:
             // Ensure cursor is not inside a chord span (prevents typing from being formatted as chord)
             this.ensureCursorOutsideChordSpan();
         }
+    }
+
+    escapeHTML(text) {
+        return (text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    escapeAttr(text) {
+        // For our current usage, HTML escaping is sufficient for attributes too.
+        return this.escapeHTML(text);
+    }
+
+    isMinorChordName(chordName) {
+        const name = (chordName || '').trim();
+        const match = name.match(/^([A-G])(#|b|♯|♭)?(.*)$/);
+        if (!match) return false;
+        const rest = (match[3] || '').trim();
+        if (/^m(?!aj|ay)/i.test(rest)) return true;
+        if (/^min/i.test(rest)) return true;
+        return false;
+    }
+
+    formatChordLineWithTechniques(line, existingChords, existingFretboards, techniqueState) {
+        const tokenRegex = /(^|[ ,])(\[oct:[12]\]|\[shell:[12]\]|\[tech:off\]|[x0-9]{3,6}|[x0-9](?:-[x0-9]+){2,5}|[A-G](?:#|b|♯|♭)?(?:[Mm]aj7|[Mm]ay7|M7|min7|m7|maj|min|m|7|dim|sus[24]?|add9|6|9|11|13)?)(?=([ ,]|$))/g;
+        const fretboardOnly = /^(?:[x0-9]{3,6}|[x0-9](?:-[x0-9]+){2,5})$/i;
+
+        let out = '';
+        let cursor = 0;
+        let match;
+
+        while ((match = tokenRegex.exec(line)) !== null) {
+            const matchStart = match.index;
+            const prefix = match[1] || '';
+            const token = match[2] || '';
+
+            out += this.escapeHTML(line.slice(cursor, matchStart));
+            out += this.escapeHTML(prefix);
+
+            cursor = matchStart + prefix.length + token.length;
+
+            const lower = token.toLowerCase();
+
+            // Technique directives
+            if (lower === '[tech:off]') {
+                techniqueState.type = null;
+                techniqueState.str = null;
+                out += `<span class="tech-directive">${this.escapeHTML(token)}</span>`;
+                continue;
+            }
+            if (lower === '[oct:1]' || lower === '[oct:2]') {
+                techniqueState.type = 'oct';
+                techniqueState.str = lower.endsWith(':1]') ? '1' : '2';
+                out += `<span class="tech-directive">${this.escapeHTML(token)}</span>`;
+                continue;
+            }
+            if (lower === '[shell:1]' || lower === '[shell:2]') {
+                techniqueState.type = 'shell';
+                techniqueState.str = lower.endsWith(':1]') ? '1' : '2';
+                out += `<span class="tech-directive">${this.escapeHTML(token)}</span>`;
+                continue;
+            }
+
+            // Fretboard notation
+            if (fretboardOnly.test(token)) {
+                const originalNotation = existingFretboards.get(token) || token;
+                const result = this.fretboardDetector.detectChord(originalNotation);
+                const detectedChord = result && result.chord ? result.chord : '?';
+                out += `<span class="chord fretboard" data-original-chord="${this.escapeAttr(originalNotation)}">${this.escapeHTML(token)} <span class="chord-hint">(${this.escapeHTML(detectedChord)})</span></span>`;
+                continue;
+            }
+
+            // Regular chord token
+            const originalChord = existingChords.get(token) || token;
+            let techAttr = '';
+            if (techniqueState && techniqueState.type && (techniqueState.str === '1' || techniqueState.str === '2')) {
+                if (techniqueState.type === 'oct') {
+                    techAttr = ` data-technique-icon="oct_str${techniqueState.str}"`;
+                } else if (techniqueState.type === 'shell') {
+                    const quality = this.isMinorChordName(originalChord) ? 'min' : 'may';
+                    techAttr = ` data-technique-icon="shell_${quality}_str${techniqueState.str}"`;
+                }
+            }
+
+            out += `<span class="chord"${techAttr} data-original-chord="${this.escapeAttr(originalChord)}">${this.escapeHTML(token)}</span>`;
+        }
+
+        out += this.escapeHTML(line.slice(cursor));
+        return out;
     }
     
     /**

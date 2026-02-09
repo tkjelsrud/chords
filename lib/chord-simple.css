@@ -544,3 +544,28 @@ chord[up]::after {
     color: #555;
     z-index: 10;
 }
+
+/* ===== Technique Icons (oct/shell) =====
+   Rendered by lib/chord-simple.js as a child element to avoid clobbering chord::after
+   (which is used for metadata) and chord[up]::after (legacy ↑). */
+chord[data-technique-icon] .tech-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    opacity: 0.95;
+    pointer-events: none;
+    margin-left: 6px;
+    vertical-align: -4px;
+}
+
+chord[data-technique-icon^="shell_may_"] .tech-icon { filter: drop-shadow(0 0 2px rgba(0, 110, 0, 0.35)); }
+chord[data-technique-icon^="shell_min_"] .tech-icon { filter: drop-shadow(0 0 2px rgba(160, 0, 0, 0.35)); }
+
+chord[data-technique-icon="oct_str1"] .tech-icon { background-image: url("icons/icn24_oct_str1.png"); }
+chord[data-technique-icon="oct_str2"] .tech-icon { background-image: url("icons/icn24_oct_str2.png"); }
+chord[data-technique-icon="shell_may_str1"] .tech-icon { background-image: url("icons/icn24_shell_may_str1.png"); }
+chord[data-technique-icon="shell_may_str2"] .tech-icon { background-image: url("icons/icn24_shell_may_str2.png"); }
+chord[data-technique-icon="shell_min_str1"] .tech-icon { background-image: url("icons/icn24_shell_min_str1.png"); }
+chord[data-technique-icon="shell_min_str2"] .tech-icon { background-image: url("icons/icn24_shell_min_str2.png"); }

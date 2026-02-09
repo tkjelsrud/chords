@@ -25,7 +25,8 @@
                 <li><strong>Minor chord distinction:</strong> Subtle red tint background + thicker color band</li>
                 <li><strong>Interactive diagrams:</strong> Click chords to see guitar fingering positions</li>
                 <li><strong>Alternative chords:</strong> Use <code>alt</code> attribute for dashed border</li>
-                <li><strong>Octave indicators:</strong> Use <code>up</code> attribute to show octave up (↑)</li>
+                <li><strong>Technique icons:</strong> Use <code>oct="1|2"</code> and <code>shell="1|2"</code> to show 24x24 icons (shell major/minor inferred from chord name)</li>
+                <li><strong>Legacy indicator:</strong> Use <code>up</code> attribute to show octave up (↑)</li>
                 <li><strong>Separators:</strong> Use <code>&lt;sep&gt;</code> for visual breaks between chord groups</li>
                 <li><strong>Compact printing:</strong> Optimized layout for cheat sheets</li>
             </ul>
@@ -50,8 +51,10 @@
         <chord alt>Em</chord>
         
         <h3>Verse</h3>
-        <p>Demonstrates octave up notation</p>
+        <p>Technique icons (octaves on str1/str2) + legacy octave up (↑)</p>
         <chord>Am</chord>
+        <chord oct="1">Am</chord>
+        <chord oct="2">Am</chord>
         <chord up>Am</chord>
         <chord>Dm</chord>
         <chord>G</chord>
@@ -69,10 +72,10 @@
         <chord>C</chord>
         
         <h3>Bridge</h3>
-        <p>Minor chords have subtle red tint</p>
-        <chord>Dm</chord>
-        <chord>Em</chord>
-        <chord>Am</chord>
+        <p>Shell voicings (shell major/minor inferred from chord name)</p>
+        <chord shell="2">Dm</chord>
+        <chord shell="2">E</chord>
+        <chord shell="2">Am</chord>
         <chord>Bm7</chord>
         
         <h3>Jazz Section</h3>
@@ -130,7 +133,13 @@
         <pre style="background: white; padding: 12px; border-radius: 4px; overflow-x: auto;"><code>&lt;!-- Alternative chord (dashed border) --&gt;
 &lt;chord alt&gt;Em&lt;/chord&gt;
 
-&lt;!-- Octave up indicator --&gt;
+&lt;!-- Technique icons (24x24) --&gt;
+&lt;chord oct=&quot;1&quot;&gt;Am&lt;/chord&gt;
+&lt;chord oct=&quot;2&quot;&gt;Am&lt;/chord&gt;
+&lt;chord shell=&quot;1&quot;&gt;Am&lt;/chord&gt;  &lt;!-- minor icon inferred --&gt;
+&lt;chord shell=&quot;2&quot;&gt;E&lt;/chord&gt;   &lt;!-- major icon inferred --&gt;
+
+&lt;!-- Legacy: octave up indicator --&gt;
 &lt;chord up&gt;Am&lt;/chord&gt;
 
 &lt;!-- Separator slash --&gt;
