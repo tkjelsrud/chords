@@ -572,7 +572,7 @@ chord[data-technique-icon="shell_min_str2"] .tech-icon { background-image: url("
 
 /* Compact single-note/tab blocks */
 riff {
-    display: inline-block;
+    display: block;
     margin: 6px 0 10px;
     padding: 6px 8px;
     border: 1px solid #e1e1e1;
