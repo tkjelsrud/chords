@@ -569,3 +569,48 @@ chord[data-technique-icon="shell_may_str1"] .tech-icon { background-image: url("
 chord[data-technique-icon="shell_may_str2"] .tech-icon { background-image: url("icons/icn24_shell_may_str2.png"); }
 chord[data-technique-icon="shell_min_str1"] .tech-icon { background-image: url("icons/icn24_shell_min_str1.png"); }
 chord[data-technique-icon="shell_min_str2"] .tech-icon { background-image: url("icons/icn24_shell_min_str2.png"); }
+
+/* Compact single-note/tab blocks */
+riff {
+    display: block;
+    margin: 6px 0 10px;
+    padding: 6px 8px;
+    border: 1px solid #e1e1e1;
+    border-left: 3px solid #b5b5b5;
+    border-radius: 4px;
+    background: #fff;
+}
+
+riff .riff-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+    color: #666;
+    font-size: 11px;
+}
+
+riff .riff-title {
+    font-weight: 700;
+    color: #444;
+}
+
+riff .riff-repeat {
+    color: #777;
+}
+
+riff .riff-tab {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: pre;
+    color: #333;
+    overflow-x: auto;
+}
+
+riff .riff-note {
+    margin-top: 4px;
+    color: #777;
+    font-size: 11px;
+}
