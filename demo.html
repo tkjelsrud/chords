@@ -25,6 +25,7 @@
                 <li><strong>Minor chord distinction:</strong> Subtle red tint background + thicker color band</li>
                 <li><strong>Interactive diagrams:</strong> Click chords to see guitar fingering positions</li>
                 <li><strong>Alternative chords:</strong> Use <code>alt</code> attribute for dashed border</li>
+                <li><strong>Half-width chords:</strong> Use <code>half</code> attribute for passing chords that share one slot</li>
                 <li><strong>Technique icons:</strong> Use <code>oct="1|2"</code> and <code>shell="1|2"</code> to show 24x24 icons (shell major/minor inferred from chord name)</li>
                 <li><strong>Legacy indicator:</strong> Use <code>up</code> attribute to show octave up (↑)</li>
                 <li><strong>Inline chord notes:</strong> Add a child tag like <code>&lt;em&gt;</code> for small subtext inside the box</li>
@@ -72,6 +73,13 @@
         <chord>F</chord>
         <chord>G</chord>
         <chord>C</chord>
+
+        <h3>Passing Chords (Half Width)</h3>
+        <p>Use <code>half</code> when two fast chords should share one normal slot</p>
+        <chord>Am</chord>
+        <chord half>C</chord>
+        <chord half>B</chord>
+        <chord>F</chord>
         
         <h3>Bridge</h3>
         <p>Shell voicings (shell major/minor inferred from chord name)</p>
@@ -91,6 +99,8 @@
         <chord bass="A">C</chord>
         <chord bass="Dm">F</chord>
         <chord bass="G">Em</chord>
+        <chord half bass="B">C</chord>
+        <chord half bass="A">B</chord>
         
         <h3>Jazz Section</h3>
         <p>Major 7th and complex chords</p>
@@ -147,6 +157,9 @@
         <pre style="background: white; padding: 12px; border-radius: 4px; overflow-x: auto;"><code>&lt;!-- Alternative chord (dashed border) --&gt;
 &lt;chord alt&gt;Em&lt;/chord&gt;
 
+&lt;!-- Half-width passing chord --&gt;
+&lt;chord half&gt;C&lt;/chord&gt;
+
 &lt;!-- Technique icons (24x24) --&gt;
 &lt;chord oct=&quot;1&quot;&gt;Am&lt;/chord&gt;
 &lt;chord oct=&quot;2&quot;&gt;Am&lt;/chord&gt;
@@ -161,6 +174,9 @@
 
 &lt;!-- Split chord with dedicated bass box --&gt;
 &lt;chord bass=&quot;A&quot;&gt;C&lt;/chord&gt;
+
+&lt;!-- Half-width split passing chord --&gt;
+&lt;chord half bass=&quot;A&quot;&gt;C&lt;/chord&gt;
 
 &lt;!-- Separator slash --&gt;
 &lt;sep&gt;&lt;/sep&gt;

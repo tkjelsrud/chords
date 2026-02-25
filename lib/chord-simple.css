@@ -133,6 +133,15 @@ chord {
     padding-bottom: 8px;
 }
 
+/* Half-step/passing chord:
+   <chord half>C</chord>
+   Uses roughly half width so two can fit in one chord slot. */
+chord[half] {
+    min-width: 35px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
 /* Optional inline subtext inside a chord:
    <chord>C <em>Play scale up</em></chord> */
 chord[data-has-subtext] {
@@ -170,6 +179,12 @@ chord[data-has-bass] {
     vertical-align: top;
     min-width: 74px;
     height: 46px;
+}
+
+/* Half-width split chord:
+   <chord half bass="A">C</chord> */
+chord[data-has-bass][half] {
+    min-width: 37px;
 }
 
 chord[data-has-bass]::before {
@@ -535,10 +550,12 @@ chord:not([data-chord])::before {
         line-height: 28px;
         border-width: 3px;
     }
+    chord[half] { min-width: 30px; }
 
     chord[data-has-subtext] { height: 38px; line-height: 18px; padding-bottom: 9px; }
 
     chord[data-has-bass] { min-width: 64px; height: 42px; }
+    chord[data-has-bass][half] { min-width: 32px; }
     chord[data-has-bass] > .main-box { font-size: 14px; }
     chord[data-has-bass] > .bass-box { font-size: 12px; }
     
@@ -556,10 +573,12 @@ chord:not([data-chord])::before {
         margin: 1px;
         border-width: 2px;
     }
+    chord[half] { min-width: 26px; }
 
     chord[data-has-subtext] { height: 34px; line-height: 16px; padding-bottom: 8px; }
 
     chord[data-has-bass] { min-width: 56px; height: 38px; }
+    chord[data-has-bass][half] { min-width: 28px; }
     chord[data-has-bass] > .main-box { font-size: 13px; }
     chord[data-has-bass] > .bass-box { font-size: 11px; }
     
@@ -604,10 +623,12 @@ chord:not([data-chord])::before {
         line-height: 28px;
         margin: 1px;
     }
+    chord[half] { min-width: 30px; }
 
     chord[data-has-subtext] { height: 36px; line-height: 18px; padding-bottom: 9px; }
 
     chord[data-has-bass] { min-width: 64px; height: 40px; }
+    chord[data-has-bass][half] { min-width: 32px; }
     chord[data-has-bass] > .main-box { font-size: 13px; }
     chord[data-has-bass] > .bass-box { font-size: 11px; }
 }
