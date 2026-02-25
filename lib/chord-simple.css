@@ -133,6 +133,104 @@ chord {
     padding-bottom: 8px;
 }
 
+/* Optional inline subtext inside a chord:
+   <chord>C <em>Play scale up</em></chord> */
+chord[data-has-subtext] {
+    height: 42px;
+    line-height: 20px;
+    padding-top: 3px;
+    padding-bottom: 10px;
+}
+
+chord[data-has-subtext] > :not(.tech-icon) {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 6px;
+    display: block;
+    max-width: calc(100% - 8px);
+    font-size: 12px;
+    line-height: 1.15;
+    font-weight: 500;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+}
+
+/* Split chord layout:
+   <chord bass="A">C</chord> */
+chord[data-has-bass] {
+    display: inline-flex;
+    flex-direction: column;
+    padding: 0;
+    line-height: normal;
+    overflow: hidden;
+    vertical-align: top;
+    min-width: 74px;
+    height: 46px;
+}
+
+chord[data-has-bass]::before {
+    display: none;
+}
+
+chord[data-has-bass]::after {
+    content: none !important;
+    display: none !important;
+}
+
+chord[data-has-bass][data-voicing]::after,
+chord[data-has-bass][data-fret]::after,
+chord[data-has-bass][up]::after {
+    content: none;
+    display: none;
+}
+
+chord[data-has-bass] > .main-box,
+chord[data-has-bass] > .bass-box {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #111;
+}
+
+chord[data-has-bass] > .main-box {
+    flex: 2 1 0;
+    padding: 0 5px;
+    font-size: 15px;
+    font-weight: 700;
+    background-color: var(--split-main-bg, #fff);
+    border-left: 4px solid var(--split-main-color, #999);
+    border-radius: 3px 3px 0 0;
+}
+
+chord[data-has-bass] > .bass-box {
+    flex: 1 1 0;
+    padding: 0 4px 5px;
+    font-size: 14px;
+    font-weight: 400;
+    background-color: #f7f7f7;
+    border-left: 4px solid var(--split-bass-color, #999);
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 3px 3px;
+}
+
+/* Split chords and inline subtext are mutually exclusive. */
+chord[data-has-bass][data-has-subtext] > :not(.main-box):not(.bass-box):not(.tech-icon) {
+    display: none;
+}
+
+chord[data-has-bass] .tech-icon {
+    display: none;
+}
+
 chord:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.15);
@@ -437,6 +535,12 @@ chord:not([data-chord])::before {
         line-height: 28px;
         border-width: 3px;
     }
+
+    chord[data-has-subtext] { height: 38px; line-height: 18px; padding-bottom: 9px; }
+
+    chord[data-has-bass] { min-width: 64px; height: 42px; }
+    chord[data-has-bass] > .main-box { font-size: 14px; }
+    chord[data-has-bass] > .bass-box { font-size: 12px; }
     
     .song h2 {
         font-size: 16px;
@@ -452,6 +556,12 @@ chord:not([data-chord])::before {
         margin: 1px;
         border-width: 2px;
     }
+
+    chord[data-has-subtext] { height: 34px; line-height: 16px; padding-bottom: 8px; }
+
+    chord[data-has-bass] { min-width: 56px; height: 38px; }
+    chord[data-has-bass] > .main-box { font-size: 13px; }
+    chord[data-has-bass] > .bass-box { font-size: 11px; }
     
     .song h2 {
         font-size: 15px;
@@ -494,6 +604,12 @@ chord:not([data-chord])::before {
         line-height: 28px;
         margin: 1px;
     }
+
+    chord[data-has-subtext] { height: 36px; line-height: 18px; padding-bottom: 9px; }
+
+    chord[data-has-bass] { min-width: 64px; height: 40px; }
+    chord[data-has-bass] > .main-box { font-size: 13px; }
+    chord[data-has-bass] > .bass-box { font-size: 11px; }
 }
 
 /* Alle moll-akkorder får svak rødlig bakgrunn */

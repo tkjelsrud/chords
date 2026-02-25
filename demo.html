@@ -27,6 +27,8 @@
                 <li><strong>Alternative chords:</strong> Use <code>alt</code> attribute for dashed border</li>
                 <li><strong>Technique icons:</strong> Use <code>oct="1|2"</code> and <code>shell="1|2"</code> to show 24x24 icons (shell major/minor inferred from chord name)</li>
                 <li><strong>Legacy indicator:</strong> Use <code>up</code> attribute to show octave up (↑)</li>
+                <li><strong>Inline chord notes:</strong> Add a child tag like <code>&lt;em&gt;</code> for small subtext inside the box</li>
+                <li><strong>Split bass box:</strong> Use <code>bass="..."</code> to show a stacked lower chord area</li>
                 <li><strong>Separators:</strong> Use <code>&lt;sep&gt;</code> for visual breaks between chord groups</li>
                 <li><strong>Compact printing:</strong> Optimized layout for cheat sheets</li>
             </ul>
@@ -77,6 +79,18 @@
         <chord shell="2">E</chord>
         <chord shell="2">Am</chord>
         <chord>Bm7</chord>
+
+        <h3>Inline Notes</h3>
+        <p>Extra performance notes can be placed on a second line inside the chord</p>
+        <chord>C <em>Play scale up</em></chord>
+        <chord>Am <small>Palm mute</small></chord>
+        <chord>F <span>Hold</span></chord>
+
+        <h3>Split Bass Chords</h3>
+        <p>Bottom box takes 1/3 height and is colored from the bass chord</p>
+        <chord bass="A">C</chord>
+        <chord bass="Dm">F</chord>
+        <chord bass="G">Em</chord>
         
         <h3>Jazz Section</h3>
         <p>Major 7th and complex chords</p>
@@ -141,6 +155,12 @@
 
 &lt;!-- Legacy: octave up indicator --&gt;
 &lt;chord up&gt;Am&lt;/chord&gt;
+
+&lt;!-- Inline note shown on small second line --&gt;
+&lt;chord&gt;C &lt;em&gt;Play scale up&lt;/em&gt;&lt;/chord&gt;
+
+&lt;!-- Split chord with dedicated bass box --&gt;
+&lt;chord bass=&quot;A&quot;&gt;C&lt;/chord&gt;
 
 &lt;!-- Separator slash --&gt;
 &lt;sep&gt;&lt;/sep&gt;
