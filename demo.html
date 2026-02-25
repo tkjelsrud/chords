@@ -27,7 +27,7 @@
                 <li><strong>Alternative chords:</strong> Use <code>alt</code> attribute for dashed border</li>
                 <li><strong>Half-width chords:</strong> Use <code>half</code> attribute for passing chords that share one slot</li>
                 <li><strong>Technique icons:</strong> Use <code>oct="1|2"</code> and <code>shell="1|2"</code> to show 24x24 icons (shell major/minor inferred from chord name)</li>
-                <li><strong>Legacy indicator:</strong> Use <code>up</code> attribute to show octave up (↑)</li>
+                <li><strong>Legacy indicators:</strong> Use <code>up</code>/<code>down</code> attributes to show octave direction arrows (↑/↓)</li>
                 <li><strong>Inline chord notes:</strong> Add a child tag like <code>&lt;em&gt;</code> for small subtext inside the box</li>
                 <li><strong>Split bass box:</strong> Use <code>bass="..."</code> to show a stacked lower chord area</li>
                 <li><strong>Separators:</strong> Use <code>&lt;sep&gt;</code> for visual breaks between chord groups</li>
@@ -54,11 +54,12 @@
         <chord alt>Em</chord>
         
         <h3>Verse</h3>
-        <p>Technique icons (octaves on str1/str2) + legacy octave up (↑)</p>
+        <p>Technique icons (octaves on str1/str2) + legacy octave direction arrows (↑/↓)</p>
         <chord>Am</chord>
         <chord oct="1">Am</chord>
         <chord oct="2">Am</chord>
         <chord up>Am</chord>
+        <chord down>Am</chord>
         <chord>Dm</chord>
         <chord>G</chord>
         
@@ -166,8 +167,9 @@
 &lt;chord shell=&quot;1&quot;&gt;Am&lt;/chord&gt;  &lt;!-- minor icon inferred --&gt;
 &lt;chord shell=&quot;2&quot;&gt;E&lt;/chord&gt;   &lt;!-- major icon inferred --&gt;
 
-&lt;!-- Legacy: octave up indicator --&gt;
+&lt;!-- Legacy: octave direction indicators --&gt;
 &lt;chord up&gt;Am&lt;/chord&gt;
+&lt;chord down&gt;Am&lt;/chord&gt;
 
 &lt;!-- Inline note shown on small second line --&gt;
 &lt;chord&gt;C &lt;em&gt;Play scale up&lt;/em&gt;&lt;/chord&gt;

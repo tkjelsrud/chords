@@ -198,7 +198,8 @@ chord[data-has-bass]::after {
 
 chord[data-has-bass][data-voicing]::after,
 chord[data-has-bass][data-fret]::after,
-chord[data-has-bass][up]::after {
+chord[data-has-bass][up]::after,
+chord[data-has-bass][down]::after {
     content: none;
     display: none;
 }
@@ -668,11 +669,9 @@ sep::before {
     content: '/';
 }
 
-/* Octave up indicator */
-
-/* Octave up indicator */
-chord[up]::after {
-    content: '↑';
+/* Legacy octave direction indicators */
+chord[up]::after,
+chord[down]::after {
     position: absolute;
     bottom: 6px;
     right: 4px;
@@ -682,9 +681,17 @@ chord[up]::after {
     z-index: 10;
 }
 
+chord[up]::after {
+    content: '↑';
+}
+
+chord[down]::after {
+    content: '↓';
+}
+
 /* ===== Technique Icons (oct/shell) =====
    Rendered by lib/chord-simple.js as a child element to avoid clobbering chord::after
-   (which is used for metadata) and chord[up]::after (legacy ↑). */
+   (which is used for metadata) and chord[up/down]::after (legacy arrows). */
 chord[data-technique-icon] .tech-icon {
     display: inline-block;
     width: 20px;
