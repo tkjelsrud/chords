@@ -297,7 +297,7 @@ export class FretboardGrid {
             const [prev, curr] = this.noteHistory;
             const semitones = Math.round(12 * Math.log2(curr.frequency / prev.frequency));
             const interval = this.getIntervalName(semitones);
-            text += `  |  Interval: ${interval}`;
+            text += `  |  ${prev.noteName} → ${curr.noteName}: ${interval}`;
         }
 
         noteDisplay.textContent = text;
