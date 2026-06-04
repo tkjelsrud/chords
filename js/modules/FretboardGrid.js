@@ -1,79 +1,51 @@
 /**
  * FretboardGrid Module
- * Displays E and A guitar strings as a clickable note grid for melody sketching
+ * Displays guitar strings as a clickable note grid for melody sketching
  */
 
 export class FretboardGrid {
     constructor(audioSynth) {
         this.audioSynth = audioSynth;
-        
-        // Guitar string data - Standard tuning for A and E strings (A on top, E on bottom)
-        this.strings = {
-            A: {
-                name: 'A (5th string)', 
-                openNote: 'A',
-                openFreq: 110.00, // A2
-                frets: []
-            },
-            E: {
-                name: 'E (6th string)',
-                openNote: 'E',
-                openFreq: 82.41, // E2
-                frets: []
-            }
-        };
-        
+
+        // Guitar string data - standard tuning, ordered high to low (tab convention)
+        this.strings = [
+            { key: 'G', name: 'G', baseNoteIndex: 7, baseOctave: 3, frets: [] },
+            { key: 'D', name: 'D', baseNoteIndex: 2, baseOctave: 3, frets: [] },
+            { key: 'A', name: 'A', baseNoteIndex: 9, baseOctave: 2, frets: [] },
+            { key: 'E', name: 'E', baseNoteIndex: 4, baseOctave: 2, frets: [] },
+        ];
+
         // Note names for chromatic scale
         this.noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        
+
         // Initialize fret data
         this.initializeFrets();
-        
+
         // State
         this.container = null;
         this.isVisible = false;
         this.lastPlayedNote = null;
+        this.noteHistory = []; // Last two clicked notes for interval display
     }
-    
+
     /**
-     * Initialize fret data for both strings (0-12 frets)
+     * Initialize fret data for all strings (0-12 frets)
      */
     initializeFrets() {
-        // E string (6th string) - starts at E2
-        const eBaseNote = 4; // E in chromatic scale (0=C)
-        const eBaseOctave = 2;
-        
-        for (let fret = 0; fret <= 12; fret++) {
-            const noteIndex = (eBaseNote + fret) % 12;
-            const octave = eBaseOctave + Math.floor((eBaseNote + fret) / 12);
-            const noteName = this.noteNames[noteIndex];
-            const freq = this.calculateFrequency(noteIndex, octave);
-            
-            this.strings.E.frets.push({
-                fret,
-                noteName: `${noteName}${octave}`,
-                frequency: freq,
-                displayName: fret === 0 ? 'Open' : `${fret}`
-            });
-        }
-        
-        // A string (5th string) - starts at A2  
-        const aBaseNote = 9; // A in chromatic scale
-        const aBaseOctave = 2;
-        
-        for (let fret = 0; fret <= 12; fret++) {
-            const noteIndex = (aBaseNote + fret) % 12;
-            const octave = aBaseOctave + Math.floor((aBaseNote + fret) / 12);
-            const noteName = this.noteNames[noteIndex];
-            const freq = this.calculateFrequency(noteIndex, octave);
-            
-            this.strings.A.frets.push({
-                fret,
-                noteName: `${noteName}${octave}`,
-                frequency: freq,
-                displayName: fret === 0 ? 'Open' : `${fret}`
-            });
-        }
+        this.strings.forEach(str => {
+            for (let fret = 0; fret <= 12; fret++) {
+                const noteIndex = (str.baseNoteIndex + fret) % 12;
+                const octave = str.baseOctave + Math.floor((str.baseNoteIndex + fret) / 12);
+                const noteName = this.noteNames[noteIndex];
+                const freq = this.calculateFrequency(noteIndex, octave);
+                str.frets.push({
+                    fret,
+                    noteName: `${noteName}${octave}`,
+                    frequency: freq,
+                    displayName: fret === 0 ? 'Open' : `${fret}`
+                });
+            }
+        });
     }
     
     /**
@@ -108,10 +80,10 @@ export class FretboardGrid {
                 <div class="fretboard-grid">
         `;
         
-        // Create fretboard for both strings
-        for (const [stringKey, stringData] of Object.entries(this.strings)) {
+        // Create fretboard for all strings
+        for (const stringData of this.strings) {
             html += `
-                <div class="guitar-string" data-string="${stringKey}">
+                <div class="guitar-string" data-string="${stringData.key}">
                     <div class="string-label">${stringData.name}</div>
                     <div class="frets">
             `;
@@ -123,8 +95,8 @@ export class FretboardGrid {
                 const hasInlay = inlays.includes(fret.fret);
                 
                 html += `
-                    <div class="${fretClass} ${hasInlay ? 'fret-marker' : ''}" 
-                         data-string="${stringKey}" 
+                    <div class="${fretClass} ${hasInlay ? 'fret-marker' : ''}"
+                         data-string="${stringData.key}"
                          data-fret="${fret.fret}"
                          data-note="${fret.noteName}"
                          data-freq="${fret.frequency}"
@@ -195,16 +167,20 @@ export class FretboardGrid {
         const fretNumber = parseInt(fret.getAttribute('data-fret'));
         const noteName = fret.getAttribute('data-note');
         const frequency = parseFloat(fret.getAttribute('data-freq'));
-        
+
+        // Track last two clicked notes for interval display
+        this.noteHistory.push({ stringName, fretNumber, noteName, frequency });
+        if (this.noteHistory.length > 2) this.noteHistory.shift();
+
         // Visual feedback
         this.highlightFret(fret);
-        
+
         // Play the note
         this.playNote(frequency, noteName);
-        
+
         // Update info display
         this.updateCurrentNote(stringName, fretNumber, noteName, frequency);
-        
+
         console.log(`Playing note: ${noteName} (${stringName} string, fret ${fretNumber}) - ${frequency.toFixed(2)} Hz`);
     }
     
@@ -294,18 +270,38 @@ export class FretboardGrid {
     }
     
     /**
+     * Return the interval name for a semitone distance
+     * @param {number} semitones
+     * @returns {string}
+     */
+    getIntervalName(semitones) {
+        const names = ['P1', 'm2', 'M2', 'm3', 'M3', 'P4', 'TT', 'P5', 'm6', 'M6', 'm7', 'M7', 'P8'];
+        const abs = Math.abs(semitones) % 12;
+        return names[abs] ?? `${abs}st`;
+    }
+
+    /**
      * Update the current note display
-     * @param {string} stringName - String name (E or A)
+     * @param {string} stringName - String name (E, A, D, or G)
      * @param {number} fretNumber - Fret number
      * @param {string} noteName - Note name
      * @param {number} frequency - Frequency in Hz
      */
     updateCurrentNote(stringName, fretNumber, noteName, frequency) {
         const noteDisplay = this.container.querySelector('#currentNote');
-        if (noteDisplay) {
-            const fretText = fretNumber === 0 ? 'Open' : `Fret ${fretNumber}`;
-            noteDisplay.textContent = `${stringName} String - ${fretText}: ${noteName} (${frequency.toFixed(1)} Hz)`;
+        if (!noteDisplay) return;
+
+        const fretText = fretNumber === 0 ? 'Open' : `Fret ${fretNumber}`;
+        let text = `${stringName} String - ${fretText}: ${noteName} (${frequency.toFixed(1)} Hz)`;
+
+        if (this.noteHistory.length === 2) {
+            const [prev, curr] = this.noteHistory;
+            const semitones = Math.round(12 * Math.log2(curr.frequency / prev.frequency));
+            const interval = this.getIntervalName(semitones);
+            text += `  |  Interval: ${interval}`;
         }
+
+        noteDisplay.textContent = text;
     }
     
     /**
@@ -344,5 +340,6 @@ export class FretboardGrid {
             this.container.innerHTML = '';
         }
         this.lastPlayedNote = null;
+        this.noteHistory = [];
     }
 }
