@@ -84,7 +84,6 @@ export class FretboardGrid {
         for (const stringData of this.strings) {
             html += `
                 <div class="guitar-string" data-string="${stringData.key}">
-                    <div class="string-label">${stringData.name}</div>
                     <div class="frets">
             `;
             
